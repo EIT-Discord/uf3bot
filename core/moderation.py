@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 
+# TODO
 class ModTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -18,4 +19,4 @@ class ModTools(commands.Cog):
     async def clean(self, context, *amount: int):
         def check(msg):
             if msg.author == self.bot.user:
-                
+                pass

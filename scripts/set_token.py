@@ -4,9 +4,9 @@ import sys
 from os import rename
 
 # the bots /data directory
-datapath = Path(__file__).parent.parent.absolute() / 'bot' / 'data'
-tokenpath = datapath / 'dctoken.pickle'
-old_tokenpath = datapath / 'dctoken_old.pickle'
+datapath = Path(__file__).parent.parent.absolute()/'data'
+tokenpath = datapath/'dctoken.pickle'
+old_tokenpath = datapath/'dctoken_old.pickle'
 
 new_token = input('new token: ')
 

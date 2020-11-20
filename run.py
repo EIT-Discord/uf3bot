@@ -1,18 +1,20 @@
+import pathlib
 import pickle
 import discord
 import sys
 
-from core.configuration import DATAPATH
+from core.bot import UffBot
 
 
 __version__ = '0.2'
 
+DATAPATH = pathlib.Path(__file__).absolute().parent/'data'
+
 
 # set discord intents
-from core.uffbot import UffBot
-
 intents = discord.Intents.default()
 intents.members = True
+
 
 # try to load the discord token
 try:
@@ -30,5 +32,5 @@ print("-------------------------")
 
 
 # start bot
-bot = UffBot('', intents=intents)
+bot = UffBot('', DATAPATH, intents=intents)
 bot.run(token)
