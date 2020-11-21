@@ -1,19 +1,14 @@
 from discord.ext import commands
 
+from core.utils import is_admin
 
-# TODO
+
 class ModTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def cog_check(self, ctx):
-        if ctx.prefix == self.bot.admin_prefix:
-            try:
-                if ctx.author.guild_permissions.manage_messages:
-                    return True
-            except AttributeError:
-                pass
-        return False
+    def cog_check(self, context):
+        return is_admin(context.author)
 
     @commands.group()
     async def clean(self, context, *amount: int):
