@@ -15,18 +15,15 @@ class UffBot(bot.Bot):
         self.configpath = self.datapath / 'botconfig.pickle'
 
         # default config
-        self.prefix = '!'
-        self.admin_prefix = '?'
+        self.command_prefix = '!'
         self.presence = ''
         self.modules = []
         self.owner_ids = set()
 
         # this set determines which attributes of the bot will be saved and loaded
-        self.attributes_to_save = {'prefix',
-                                   'admin_prefix',
-                                   'presence',
+        self.attributes_to_save = {'presence',
                                    'modules',
-                                   'owner_ids'}
+                                   'command_prefix'}
 
     async def on_ready(self):
         print("-------------------------")
@@ -68,22 +65,12 @@ class UffBot(bot.Bot):
         except FileNotFoundError:
             print('No bot configuration found. Using default settings.')
 
-        self.set_prefix()  # needs to be called, to set the already loaded prefixes
-
         # try to load modules from config
         for module in self.modules:
             try:
                 self.load_extension('modules.' + module)
             except ExtensionNotFound:
                 print(f'No module named {module} found. Ignoring module import.')
-
-    def set_prefix(self, prefix=None, admin_prefix=None):
-        if prefix:
-            self.prefix = prefix
-        if admin_prefix:
-            self.admin_prefix = admin_prefix
-
-        self.command_prefix = (self.prefix, self.admin_prefix)
 
     async def set_presence(self, presence):
         await self.change_presence(status=discord.Status.online, activity=discord.Game(presence))
