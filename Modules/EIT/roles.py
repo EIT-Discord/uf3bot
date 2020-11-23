@@ -23,3 +23,4 @@ class Roles(commands.Cog):
             await member.remove_roles(among_us_role)
         else:
             await member.add_roles(among_us_role)
+    pass
