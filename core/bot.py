@@ -31,6 +31,13 @@ class UffBot(bot.Bot):
         print(f"{str(self.user)}, {self.user.id}")
         print("-------------------------")
 
+        if len(self.guilds) == 0:
+            client_id = (await self.application_info()).id
+            print('The bot is not a member of any server, use this url to invite him to your server')
+            print(f'https://discordapp.com/oauth2/authorize?client_id={client_id}&scope=bot')
+        elif len(self.guilds) > 1:
+            print('The bot is a member of more than one server, this may lead to unexpected behavior or errors.')
+
         # load bot settings
         self.load_config()
 

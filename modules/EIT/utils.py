@@ -1,6 +1,15 @@
 import discord
 
 
+def is_student(eit, member):
+    try:
+        if eit.student_role_id in [role.id for role in member.roles]:
+            return True
+    except AttributeError:
+        pass
+    return False
+
+
 def get_member(bot, user):
     return discord.utils.get(bot.guilds[0].members, id=user.id)
 
