@@ -286,9 +286,9 @@ def format_seconds(seconds):
     days = int(seconds / 86400)
     if days >= 1:
         if days < 2:
-            output += 'einem Tag und '
+            output += 'einem Tag, '
         else:
-            output += f'{days} Tagen und '
+            output += f'{days} Tagen, '
         seconds -= days*86400
 
     hours = int(seconds / 3600)

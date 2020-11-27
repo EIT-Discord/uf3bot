@@ -1,4 +1,5 @@
 from discord.ext import commands
+from core.utils import check_pinned
 
 
 class ModTools(commands.Cog):
@@ -7,4 +8,4 @@ class ModTools(commands.Cog):
 
     @commands.group()
     async def clean(self, context):
-        await context.channel.purge(limit=500)
+        await context.channel.purge(check=check_pinned, limit=500)
