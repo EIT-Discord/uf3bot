@@ -11,7 +11,7 @@ class Roles(commands.Cog):
 
     @commands.command(name='amongus')
     async def among_us(self, context):
-        await self.toggle_role(context.author, self.eit.game_roles['among us'])
+        await self.toggle_role(context.author, self.eit.game_roles['among_us'])
 
     @commands.command()
     async def csgo(self, context):
@@ -23,4 +23,3 @@ class Roles(commands.Cog):
             await member.remove_roles(among_us_role)
         else:
             await member.add_roles(among_us_role)
-    pass

@@ -1,14 +1,15 @@
 import asyncio
 
+from discord.ext import commands
 
-def is_admin(member):
-    try:
-        if member.guild_permissions.administrator:
-            return True
-    except AttributeError:
-        pass
-    return False
 
+def is_admin_check():
+    async def predicate(context):
+        try:
+            return context.author.guild_permissions.administrator
+        except AttributeError:
+            return False
+    return commands.check(predicate)
 
 async def user_input(bot, channel, user):
     event = UserInputEvent(bot, channel, user)

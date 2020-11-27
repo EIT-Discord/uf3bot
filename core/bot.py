@@ -1,4 +1,6 @@
 import pickle
+
+import asyncio
 import discord
 from discord.ext.commands import bot, ExtensionNotFound
 
@@ -18,7 +20,6 @@ class UffBot(bot.Bot):
         self.command_prefix = '!'
         self.presence = ''
         self.modules = []
-        self.owner_ids = set()
 
         # this set determines which attributes of the bot will be saved and loaded
         self.attributes_to_save = {'presence',
@@ -26,7 +27,6 @@ class UffBot(bot.Bot):
                                    'command_prefix'}
 
     async def on_ready(self):
-        print("-------------------------")
         print('Logged in as')
         print(f"{str(self.user)}, {self.user.id}")
         print("-------------------------")
@@ -78,6 +78,8 @@ class UffBot(bot.Bot):
                 self.load_extension('modules.' + module)
             except ExtensionNotFound:
                 print(f'No module named {module} found. Ignoring module import.')
+
+        asyncio.create_task(self.change_presence(status=discord.Status.online, activity=discord.Game(self.presence)))
 
     async def set_presence(self, presence):
         await self.change_presence(status=discord.Status.online, activity=discord.Game(presence))
