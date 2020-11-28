@@ -1,11 +1,12 @@
 import asyncio
 
 import yaml
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.utils import get
 
 from core.utils import is_admin_check
 from modules.EIT.calendar import Calendar
+from modules.EIT.hm_feed import HMFeed
 from modules.EIT.roles import Roles
 from modules.EIT.setup import setup_dialog
 from modules.EIT.utils import get_member
@@ -26,12 +27,15 @@ class EIT(commands.Cog):
         self.semester = []
         self.game_roles = {}
         self.admin_calendar = None
+        self.hm_feed_url = None
+        self.hm_feed_channel = None
 
         self.import_config()
 
         self.bot.add_listener(self.on_member_join)
         self.bot.add_cog(Roles(self))
         self.bot.add_cog(Calendar(self))
+        self.bot.add_cog(HMFeed(self))
 
     def print_config(self):
         output = ''
@@ -57,6 +61,8 @@ class EIT(commands.Cog):
 
         self.game_roles = config['game_roles']
         self.admin_calendar = get(self.guild.channels, id=config['admin_calendar'])
+        self.hm_feed_channel = get(self.guild.channels, id=config['hm_feed']['channel'])
+        self.hm_feed_url = config['hm_feed']['url']
 
     @commands.group()
     @is_admin_check()

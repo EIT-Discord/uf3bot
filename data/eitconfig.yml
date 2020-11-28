@@ -4,6 +4,10 @@ game_roles:
   among_us: 780466910147379211
   csgo: 780471935338283080
 
+hm_feed:
+  url: https://www.hm.edu/2/rss_feeds/newsrss/news_allg_rss.de.xml
+  channel: 765632176233775205
+
 admin_calendar: 780499136007897159
 
 semester:

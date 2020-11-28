@@ -16,74 +16,6 @@ from discord.ext import tasks, commands
 TIMEZONE = timezone('Europe/Berlin')
 
 
-def fetch_entries(limit=3):
-    """ Fetches upcoming calendar entries
-
-    Parameters
-    ----------
-    limit:  The maximum amount of calendar entries fetched per calendar
-
-    Returns
-    -------
-    A flattened list of calendar entries
-    """
-
-    # If modifying these scopes, delete the file token.pickle.
-    scopes = ['https://www.googleapis.com/auth/calendar.readonly']
-
-    creds = None
-
-    if os.path.exists('data/google/token.pickle'):
-        with open('data/google/token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'data/google/credentials.json', scopes)
-            creds = flow.run_local_server(port=0)
-
-        # Save the credentials for the next run
-        with open('data/google/token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('calendar', 'v3', credentials=creds)
-    # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    calendars_result = service.calendarList().list().execute()
-    events = []
-
-    for calendar_info in calendars_result['items']:
-        calendar = service.events().list(calendarId=calendar_info['id'], timeMin=now,
-                                         maxResults=limit,
-                                         singleEvents=True,
-                                         orderBy='startTime').execute()
-        for entry in calendar['items']:
-            if 'backgroundColor' in calendar_info:
-                entry['calendarColorId'] = calendar_info['backgroundColor']
-            events.append(entry)
-
-    return events
-
-
-def parse_time(event, event_time_key):
-    """Helper function that gets the in :entry_time_key: specified time string
-    from the entry dict and returns it as an datetime object"""
-
-    if 'dateTime' in event[event_time_key]:
-        time_unparsed = event[event_time_key]['dateTime']
-        return dateutil.parser.parse(time_unparsed).astimezone(TIMEZONE)
-    elif 'date' in event[event_time_key]:
-        time_unparsed = event[event_time_key]['date']
-        return dateutil.parser.parse(time_unparsed).astimezone(TIMEZONE)
-    else:
-        print("No date or dateTime key in entry dict recieved from Google Calendar API. Ignoring entry.")
-
-
 class Calendar(commands.Cog):
     refresh_interval = 15
 
@@ -169,7 +101,7 @@ class Reminder:
 
         self.task = asyncio.create_task(self.refresh())
 
-    async def refresh(self, refresh_interval=10):
+    async def refresh(self, refresh_interval=20):
         while True:
             try:
                 now = datetime.datetime.now(TIMEZONE)
@@ -276,6 +208,79 @@ class Reminder:
         self.embed.title = f'**{self.calendar_name}**:  {self.summary} {format_seconds(seconds_until_event)}'
 
 
+def fetch_entries(limit=10, max_seconds_until_remind=300):
+    """ Fetches upcoming calendar entries
+
+    Parameters
+    ----------
+    limit:  The maximum amount of calendar entries fetched per calendar
+
+    Returns
+    -------
+    A flattened list of calendar entries
+    """
+
+    # If modifying these scopes, delete the file token.pickle.
+    scopes = ['https://www.googleapis.com/auth/calendar.readonly']
+
+    creds = None
+
+    if os.path.exists('data/google/token.pickle'):
+        with open('data/google/token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'data/google/credentials.json', scopes)
+            creds = flow.run_local_server(port=0)
+
+        # Save the credentials for the next run
+        with open('data/google/token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('calendar', 'v3', credentials=creds)
+    # Call the Calendar API
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    calendars_result = service.calendarList().list().execute()
+    events = []
+
+    current_time = current_datetime()
+
+    for calendar_info in calendars_result['items']:
+        calendar = service.events().list(calendarId=calendar_info['id'], timeMin=now,
+                                         maxResults=limit,
+                                         singleEvents=True,
+                                         orderBy='startTime').execute()
+
+        for entry in calendar['items']:
+            if 'backgroundColor' in calendar_info:
+                entry['calendarColorId'] = calendar_info['backgroundColor']
+
+            if (parse_remind_time(entry) - current_time).total_seconds() <= max_seconds_until_remind:
+                events.append(entry)
+
+    return events
+
+
+def parse_time(event, event_time_key):
+    """Helper function that gets the in :entry_time_key: specified time string
+    from the entry dict and returns it as an datetime object"""
+
+    if 'dateTime' in event[event_time_key]:
+        time_unparsed = event[event_time_key]['dateTime']
+        return dateutil.parser.parse(time_unparsed).astimezone(TIMEZONE)
+    elif 'date' in event[event_time_key]:
+        time_unparsed = event[event_time_key]['date']
+        return dateutil.parser.parse(time_unparsed).astimezone(TIMEZONE)
+    else:
+        print("No date or dateTime key in entry dict recieved from Google Calendar API. Ignoring entry.")
+
+
 def format_seconds(seconds):
     if seconds > 0:
         output = 'in '
@@ -308,3 +313,15 @@ def format_seconds(seconds):
         output += 'weniger als einer Minute'
 
     return output
+
+
+def parse_remind_time(event):
+    if 'reminders' in event and 'overrides' in event['reminders']:
+        remind_minutes = event['reminders']['overrides'][0]['minutes']
+    else:
+        remind_minutes = 30
+    return parse_time(event, 'start') - datetime.timedelta(minutes=remind_minutes)
+
+
+def current_datetime():
+    return datetime.datetime.now(TIMEZONE)

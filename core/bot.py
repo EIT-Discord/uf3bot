@@ -48,6 +48,8 @@ class UffBot(bot.Bot):
         print('Bot fully initialized, using following settings:')
         print(self.print_config())
 
+        asyncio.create_task(ongoing_tasks())
+
     def save_config(self):
         config_to_save = {}
         for key, val in self.__dict__.items():
@@ -84,3 +86,9 @@ class UffBot(bot.Bot):
     async def set_presence(self, presence):
         await self.change_presence(status=discord.Status.online, activity=discord.Game(presence))
         self.presence = presence
+
+
+async def ongoing_tasks():
+    while True:
+        print(len(asyncio.all_tasks()))
+        await asyncio.sleep(1)
