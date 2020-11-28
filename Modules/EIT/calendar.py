@@ -308,3 +308,5 @@ def format_seconds(seconds):
         output += 'weniger als einer Minute'
 
     return output
+
+.
