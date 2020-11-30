@@ -1,6 +1,8 @@
 import pickle
 
 import asyncio
+import sys
+
 import discord
 from discord.ext.commands import bot, ExtensionNotFound
 
@@ -11,6 +13,8 @@ from core.moderation import ModTools
 class UffBot(bot.Bot):
     def __init__(self, command_prefix, datapath, **kwargs):
         super().__init__(command_prefix, **kwargs)
+
+        self.guild = None
 
         # datapaths
         self.datapath = datapath
@@ -35,11 +39,14 @@ class UffBot(bot.Bot):
             client_id = (await self.application_info()).id
             print('The bot is not a member of any server, use this url to invite him to your server')
             print(f'https://discordapp.com/oauth2/authorize?client_id={client_id}&scope=bot')
+            sys.exit()
         elif len(self.guilds) > 1:
             print('The bot is a member of more than one server, this may lead to unexpected behavior or errors.')
 
         # load bot settings
         self.load_config()
+
+        self.guild = self.guilds[0]
 
         # adding core cogs
         self.add_cog(BotControl(self))
@@ -47,8 +54,6 @@ class UffBot(bot.Bot):
 
         print('Bot fully initialized, using following settings:')
         print(self.print_config())
-
-        asyncio.create_task(ongoing_tasks())
 
     def save_config(self):
         config_to_save = {}
@@ -86,9 +91,3 @@ class UffBot(bot.Bot):
     async def set_presence(self, presence):
         await self.change_presence(status=discord.Status.online, activity=discord.Game(presence))
         self.presence = presence
-
-
-async def ongoing_tasks():
-    while True:
-        print(len(asyncio.all_tasks()))
-        await asyncio.sleep(1)

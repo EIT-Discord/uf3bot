@@ -7,13 +7,29 @@ def check_pinned(message):
     return not message.pinned
 
 
-def is_admin_check():
+def is_admin():
     async def predicate(context):
         try:
             return context.author.guild_permissions.administrator
         except AttributeError:
             return False
     return commands.check(predicate)
+
+
+async def send_more(messageable, content):
+    while True:
+        if len(content) > 1995:
+            await messageable.send('```'+content[:1994]+'```')
+            content = content[1994:]
+        else:
+            await messageable.send('```'+content+'```')
+            return
+
+
+async def ongoing_tasks():
+    while True:
+        print(len(asyncio.all_tasks()))
+        await asyncio.sleep(1)
 
 
 async def user_input(bot, channel, user):

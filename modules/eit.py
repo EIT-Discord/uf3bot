@@ -1,10 +1,8 @@
-import asyncio
-
 import yaml
 from discord.ext import commands, tasks
 from discord.utils import get
 
-from core.utils import is_admin_check
+from core.utils import is_admin
 from modules.EIT.calendar import Calendar
 from modules.EIT.hm_feed import HMFeed
 from modules.EIT.roles import Roles
@@ -65,7 +63,7 @@ class EIT(commands.Cog):
         self.hm_feed_url = config['hm_feed']['url']
 
     @commands.group()
-    @is_admin_check()
+    @is_admin()
     async def eit(self, context):
         pass
 

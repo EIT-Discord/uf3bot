@@ -6,7 +6,7 @@ from discord.ext import tasks, commands
 
 
 class HMFeed(commands.Cog):
-    refresh_interval = 10
+    refresh_interval = 30
 
     def __init__(self, eit):
         self.entries = []
@@ -16,6 +16,21 @@ class HMFeed(commands.Cog):
 
         self.load()
         self.refresh.start()
+
+    @commands.command()
+    async def feed(self, context, amount: int):
+        # TODO: wieder entfernen
+        if amount > 20:
+            amount = 20
+        elif amount < 1:
+            amount = 1
+
+        new_feed = feedparser.parse(self.url)
+        for entry in new_feed["entries"]:
+            if amount <= 0:
+                return
+            await self.send_entry(entry)
+            amount -= 1
 
     @tasks.loop(seconds=refresh_interval)
     async def refresh(self):
