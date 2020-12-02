@@ -209,7 +209,7 @@ class Reminder:
         self.embed.title = f'**{self.calendar_name}**:  {self.summary} {format_seconds(seconds_until_event)}'
 
 
-def fetch_entries(limit=10, max_seconds_until_remind=300):
+def fetch_entries(limit=5, max_seconds_until_remind=300):
     """ Fetches upcoming calendar entries
 
     Parameters
