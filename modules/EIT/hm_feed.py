@@ -5,12 +5,14 @@ import pickle
 from discord.ext import tasks, commands
 
 
+# TODO: Feed der FK04
+
 class HMFeed(commands.Cog):
     refresh_interval = 30
 
     def __init__(self, eit):
         self.entries = []
-        self.picklepath = eit.bot.datapath/'hmfeed.pickle'
+        self.picklepath = eit.bot.datapath / 'hmfeed.pickle'
         self.url = eit.hm_feed_url
         self.channel = eit.hm_feed_channel
 
@@ -19,6 +21,7 @@ class HMFeed(commands.Cog):
 
     @commands.command()
     async def feed(self, context, amount: int):
+        """Sendet die angebende Anzahl an Feeds"""
         # TODO: wieder entfernen
         if amount > 20:
             amount = 20

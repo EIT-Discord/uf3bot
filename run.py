@@ -8,6 +8,7 @@ from core.bot import UffBot
 
 __version__ = '0.2'
 
+
 DATAPATH = pathlib.Path(__file__).absolute().parent/'data'
 
 

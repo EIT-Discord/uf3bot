@@ -66,6 +66,7 @@ class Calendar(commands.Cog):
 
     @commands.command()
     async def ongoing(self, context):
+        """Zeigt die aktuellen Termine an"""
         output = '```'
         for reminder in self.reminders:
             if reminder.is_running:

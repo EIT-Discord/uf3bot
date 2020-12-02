@@ -23,7 +23,7 @@ class EIT(commands.Cog):
         # eitconfig
         self.student_role_id = None
         self.semester = []
-        self.game_roles = {}
+        self.game_role = None
         self.admin_calendar = None
         self.hm_feed_url = None
         self.hm_feed_channel = None
@@ -57,7 +57,7 @@ class EIT(commands.Cog):
             new_semester = Semester(semester['name'], announcement_channel, semester['groups'])
             self.semester.append(new_semester)
 
-        self.game_roles = config['game_roles']
+        self.game_role = config['gamer_id']
         self.admin_calendar = get(self.guild.channels, id=config['admin_calendar'])
         self.hm_feed_channel = get(self.guild.channels, id=config['hm_feed']['channel'])
         self.hm_feed_url = config['hm_feed']['url']
@@ -65,15 +65,18 @@ class EIT(commands.Cog):
     @commands.group()
     @is_admin()
     async def eit(self, context):
+        """Zur Konfiguration des EIT-Moduls"""
         pass
 
     @eit.command()
     async def load(self, context):
+        """Wofür auch immer"""
         self.import_config()
         await context.channel.send('_Config successfully loaded._')
 
     @eit.command()
     async def config(self, context):
+        """Zeigt die EIT-Config"""
         await context.channel.send('```' + self.print_config() + '```')
 
     async def on_member_join(self, member):
@@ -81,6 +84,7 @@ class EIT(commands.Cog):
 
     @commands.command()
     async def setup(self, context):
+        """Zum Einschreiben in den Server"""
         member = get_member(self.bot, context.author)
         await setup_dialog(self, member)
 

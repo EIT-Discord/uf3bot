@@ -4,6 +4,7 @@ from core.utils import user_input
 from modules.EIT import embeds
 from modules.EIT.utils import get_study_groups, get_role
 
+# TODO: Gastrolle auswählbar
 
 async def setup_dialog(eit, member):
     # send beginning message

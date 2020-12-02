@@ -8,4 +8,5 @@ class ModTools(commands.Cog):
 
     @commands.group()
     async def clean(self, context):
+        """Löscht alle Nachrichten, die nicht angepinnt wurden"""
         await context.channel.purge(check=check_pinned, limit=500)

@@ -1,45 +1,67 @@
-student_id: 765632175903080470
+student_id: 783621156967809047
 
-game_roles:
-  among_us: 780466910147379211
-  csgo: 780471935338283080
+gamer_id: 783621156967809045
 
 hm_feed:
   url: https://www.hm.edu/2/rss_feeds/newsrss/news_allg_rss.de.xml
-  channel: 765632176233775205
+  channel: 783622385693229078
 
-admin_calendar: 780499136007897159
+admin_calendar: 783621158418645011
 
 semester:
   1:
     name: 1.Semester
-    announcement_channel: 765632176522920012
+    announcement_channel: 783621454083260416
     groups:
-      BAC1A: 765632175903080474
-      BAC1B: 765632175903080472
-      BAC1C: 765632175903080473
-      BAC1D: 765632175903080474
+      BAC1A: 783621156967809051
+      BAC1B: 783621156967809050
+      BAC1C: 783621156967809049
+      BAC1D: 783621156967809048
 
   2:
     name: 2.Semester
-    announcement_channel: 765632176695672834
+    announcement_channel: 783621525315518474
     groups:
-      BAC2A: 765632175903080476
-      BAC2B: 765632175903080475
-      2W: 765632175903080477
+      BAC2A: 783621156975804426
+      BAC2B: 783621156967809053
+      2W: 783621156967809052
 
   3:
     name: 3.Semester
-    announcement_channel: 765632176867377202
+    announcement_channel: 783621582438006784
     groups:
-      EIB3A: 765632175953018932
-      EIB3B: 765632175953018931
-      RE/EM3: 765632175953018930
+      EIB3A: 783621156975804429
+      EIB3B: 783621156975804428
+      RE/EM3: 783621156975804427
 
   4:
     name: 4.Semester
-    announcement_channel: 765632177156522054
+    announcement_channel: 783621644031229972
     groups:
-      EIB4A: 765632175953018935
-      REB4A: 765632175953018934
-      EMB4A: 765632175953018933
+      EIB4A: 783621156975804433
+      REB4A: 783621156975804432
+      EMB4A: 783621156975804431
+      4W: 783621156975804430
+
+  5:
+    name: 5. Semester
+    announcement_channel: 783621157936562191
+    groups:
+      B5P: 783621156975804434
+
+  6:
+    name: 6. Semester
+    announcement_channel: 783621158092275732
+    groups:
+      EIB6: 783621156980654093
+      REB6: 783621156980654092
+      EMB6: 783621156975804435
+
+  7:
+    name: 7. Semester
+    announcement_channel: 783621158092275735
+    groups:
+      EIB7A: 783621156980654097
+      EIB7B: 783621156980654096
+      REB7: 783621156980654095
+      EMB7: 783621156980654094
