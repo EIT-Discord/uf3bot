@@ -1,5 +1,5 @@
 import yaml
-from discord.ext import commands, tasks
+from discord.ext import commands
 from discord.utils import get
 
 from core.utils import is_admin
@@ -87,6 +87,17 @@ class EIT(commands.Cog):
         """Zum Einschreiben in den Server"""
         member = get_member(self.bot, context.author)
         await setup_dialog(self, member)
+
+    @commands.command()
+    async def admin(self, context):
+        await context.channel.send("Yannic Breiting (Der Grüne) <:yannic:784125860256022559>\n"
+                                   "Elias Deking (The Brain) <:elias:784125860008951850>\n"
+                                   "Franz Ostler (Da Wirtshausfranz) <:franz:784125860415537172>\n"
+                                   "Martin Kistler (The Nerd) :Tux:\n"
+                                   "Benni Draxlbauer (The Beachboy)<:benni:784125859803693107>\n"
+                                   "Michi Besl (Der Feuerwehrmann) <:michi:784125860420517971>\n"
+                                   "Merih Cetin (Der TUM-Student) <:merih:784125860352360478>\n"
+                                   "Jan Duchscherer (The Brain aus der B):jan:")
 
 
 class Semester:
