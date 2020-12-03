@@ -1,38 +1,10 @@
+import itertools
+import discord
+from discord.ext.commands import HelpCommand
+
+
 class DefaultHelpCommand(HelpCommand):
-    """The implementation of the default help command.
-
-    This inherits from :class:`HelpCommand`.
-
-    It extends it with the following attributes.
-
-    Attributes
-    ------------
-    width: :class:`int`
-        The maximum number of characters that fit in a line.
-        Defaults to 80.
-    sort_commands: :class:`bool`
-        Whether to sort the commands in the output alphabetically. Defaults to ``True``.
-    dm_help: Optional[:class:`bool`]
-        A tribool that indicates if the help command should DM the user instead of
-        sending it to the channel it received it from. If the boolean is set to
-        ``True``, then all help output is DM'd. If ``False``, none of the help
-        output is DM'd. If ``None``, then the bot will only DM when the help
-        message becomes too long (dictated by more than :attr:`dm_help_threshold` characters).
-        Defaults to ``False``.
-    dm_help_threshold: Optional[:class:`int`]
-        The number of characters the paginator must accumulate before getting DM'd to the
-        user if :attr:`dm_help` is set to ``None``. Defaults to 1000.
-    indent: :class:`int`
-        How much to indent the commands from a heading. Defaults to ``2``.
-    commands_heading: :class:`str`
-        The command list's heading string used when the help command is invoked with a category name.
-        Useful for i18n. Defaults to ``"Commands:"``
-    no_category: :class:`str`
-        The string used when there is a command which does not belong to any category(cog).
-        Useful for i18n. Defaults to ``"No Category"``
-    paginator: :class:`Paginator`
-        The paginator used to paginate the help command output.
-    """
+    """The implementation of the default help command."""
 
     def __init__(self, **options):
         self.width = options.pop('width', 80)
@@ -62,27 +34,7 @@ class DefaultHelpCommand(HelpCommand):
                "You can also type {0}{1} category for more info on a category.".format(self.clean_prefix, command_name)
 
     def add_indented_commands(self, commands, *, heading, max_size=None):
-        """Indents a list of commands after the specified heading.
-
-        The formatting is added to the :attr:`paginator`.
-
-        The default implementation is the command name indented by
-        :attr:`indent` spaces, padded to ``max_size`` followed by
-        the command's :attr:`Command.short_doc` and then shortened
-        to fit into the :attr:`width`.
-
-        Parameters
-        -----------
-        commands: Sequence[:class:`Command`]
-            A list of commands to indent for output.
-        heading: :class:`str`
-            The heading to add to the output. This is only added
-            if the list of commands is greater than 0.
-        max_size: Optional[:class:`int`]
-            The max size to use for the gap between indents.
-            If unspecified, calls :meth:`get_max_size` on the
-            commands parameter.
-        """
+        """Indents a list of commands after the specified heading."""
 
         if not commands:
             return
@@ -148,6 +100,7 @@ class DefaultHelpCommand(HelpCommand):
             self.paginator.add_line(bot.description, empty=True)
 
         no_category = '\u200b{0.no_category}:'.format(self)
+
         def get_category(command, *, no_category=no_category):
             cog = command.cog
             return cog.qualified_name + ':' if cog is not None else no_category

@@ -83,8 +83,8 @@ class HMFeed(commands.Cog):
 
                 new_embed.description = entry['summary']
                 published = entry['published_parsed']
-                str = f'Veröffentlicht am {published.tm_mday}.{published.tm_mon}.{published.tm_year}'
-                new_embed.set_footer(text=str)
+                text = f'Veröffentlicht am {published.tm_mday}.{published.tm_mon}.{published.tm_year}'
+                new_embed.set_footer(text=text)
                 await message.edit(content=None, embed=new_embed)
                 return
 

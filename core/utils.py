@@ -13,16 +13,17 @@ def is_admin():
             return context.author.guild_permissions.administrator
         except AttributeError:
             return False
+
     return commands.check(predicate)
 
 
 async def send_more(messageable, content):
     while True:
         if len(content) > 1995:
-            await messageable.send('```'+content[:1994]+'```')
+            await messageable.send('```' + content[:1994] + '```')
             content = content[1994:]
         else:
-            await messageable.send('```'+content+'```')
+            await messageable.send('```' + content + '```')
             return
 
 
@@ -39,7 +40,7 @@ async def user_input(bot, channel, user):
 
 
 async def c_user_input(context):
-    event = UserInputEvent(context.bot, context.channel, context.user)
+    event = UserInputEvent(context.bot, context.channel, context.author)
     while True:
         return await event.queue.get()
 
