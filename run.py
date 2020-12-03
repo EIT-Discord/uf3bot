@@ -34,5 +34,5 @@ print("-------------------------")
 
 
 # start bot
-bot = UffBot('', DATAPATH, intents=intents)
+bot = UffBot('', DATAPATH, intents=intents, help_command=DefaultHelpCommand())
 bot.run(token)
