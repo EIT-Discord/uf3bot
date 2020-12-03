@@ -67,11 +67,14 @@ class Calendar(commands.Cog):
     @commands.command()
     async def ongoing(self, context):
         """Zeigt die aktuellen Termine an"""
-        output = '```'
-        for reminder in self.reminders:
-            if reminder.is_running:
-                output += f'{reminder.calendar_name}: {reminder.summary}\n'
-        await context.channel.send(output + '```')
+        output = ''
+        if not self.reminders:
+            await context.channel.send('Es gibt keine laufenden Termine im Moment!')
+        else:
+            for reminder in self.reminders:
+                if reminder.is_running:
+                    output += f'{reminder.calendar_name}: {reminder.summary}\n'
+            await context.channel.send('```' + output + '```')
 
 
 class Reminder:
@@ -221,28 +224,11 @@ def fetch_entries(limit=5, max_seconds_until_remind=300):
     A flattened list of calendar entries
     """
 
-    # If modifying these scopes, delete the file token.pickle.
-    scopes = ['https://www.googleapis.com/auth/calendar.readonly']
-
     creds = None
 
-    if os.path.exists('data/google/token.pickle'):
-        with open('data/google/token.pickle', 'rb') as token:
+    if os.path.exists('data/token.pickle'):
+        with open('data/token.pickle', 'rb') as token:
             creds = pickle.load(token)
-
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'data/google/credentials.json', scopes)
-            creds = flow.run_local_server(port=0)
-
-        # Save the credentials for the next run
-        with open('data/google/token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
 
     service = build('calendar', 'v3', credentials=creds)
     # Call the Calendar API
