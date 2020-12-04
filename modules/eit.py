@@ -1,6 +1,8 @@
+import discord
 import yaml
 from discord.ext import commands
 from discord.utils import get
+
 
 from core.utils import is_admin
 from modules.EIT.calendar import Calendar
@@ -90,14 +92,22 @@ class EIT(commands.Cog):
 
     @commands.command()
     async def admin(self, context):
-        await context.channel.send("Yannic Breiting (Der Grüne) <:yannic:784125860256022559>\n"
-                                   "Elias Deking (The Brain) <:elias:784125860008951850>\n"
-                                   "Franz Ostler (Da Wirtshausfranz) <:franz:784125860415537172>\n"
-                                   "Martin Kistler (The Nerd) :Tux:\n"
-                                   "Benni Draxlbauer (The Beachboy)<:benni:784125859803693107>\n"
-                                   "Michi Besl (Der Feuerwehrmann) <:michi:784125860420517971>\n"
-                                   "Merih Cetin (Der TUM-Student) <:merih:784125860352360478>\n"
-                                   "Jan Duchscherer (The Brain aus der B):jan:")
+        """Easteregg"""
+        embed = discord.Embed(name='Admins')
+        admin_dict = {"Yannic": "Yannic Breiting (Der Grüne)",
+                      "Elias": "Elias Deking (The Brain)",
+                      "Franz": "Franz Ostler (Da Wirtshausfranz)",
+                      "Martin": "Martin Kistler (The Nerd)",
+                      "Benni": "Benni Draxlbauer (The Beachboy)",
+                      "Michi": "Michi Besl (Der Feuerwehrmann)",
+                      "Merih": "Merih Cetin (Der TUM-Student)",
+                      "Jan": "Jan Duchscherer (The Brain aus der B)"}
+
+        for admin_name, description in admin_dict.items():
+            for emoji in self.guild.emojis:
+                if admin_name.lower() == emoji.name.lower():
+                    embed.add_field(name=description, value=str(emoji), inline=False)
+        await context.channel.send(embed=embed)
 
 
 class Semester:

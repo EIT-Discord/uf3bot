@@ -1,11 +1,10 @@
+import pickle
 from io import BytesIO
 
 import discord
 import requests
 import wolframalpha
 from discord.ext import commands
-
-app_id = '53AHTA-KJAGJJR2LL'
 
 
 def setup(bot):
@@ -15,12 +14,16 @@ def setup(bot):
 class Wolfram(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-        self.wolfram_client = wolframalpha.Client(app_id)
-        # self.configpath = self.bot.datapath / 'wolframconfig.pickle'
+        try:
+            with (self.bot.datapath / 'wolfram_token.pickle').open('rb') as file:
+                self.token = pickle.load(file)
+        except FileNotFoundError:
+            print('No wolfram-token found, use scripts/set_wolfram.py to set one.')
+        self.wolfram_client = wolframalpha.Client(self.token)
 
     @commands.command()
     async def wolfram(self, context, *, query: str):
+        """Suchanfrage an die WolframAlpha API"""
         res = self.wolfram_client.query(query)
 
         try:
@@ -28,7 +31,7 @@ class Wolfram(commands.Cog):
                 for sub in pod.subpods:
                     if sub['img']:
                         imgurl = sub['img']['@src']
-                        imgtitle = pod['@title']
+                        imgtitle = f"```{pod['@title']}```"
                         binimg = BytesIO(requests.get(imgurl).content)
                         await context.channel.send(imgtitle, file=discord.File(binimg, filename='wolframalpha.png'))
         except AttributeError:

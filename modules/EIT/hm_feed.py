@@ -21,7 +21,7 @@ class HMFeed(commands.Cog):
 
     @commands.command()
     async def feed(self, context, amount: int):
-        """Sendet die angebende Anzahl an Feeds"""
+        """Sendet die angebende Anzahl an Feed-Einträgen"""
         # TODO: wieder entfernen
         if amount > 20:
             amount = 20
