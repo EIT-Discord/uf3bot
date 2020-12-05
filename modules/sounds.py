@@ -20,6 +20,7 @@ class SoundBoard(commands.Cog):
         self.bot.add_listener(self.on_message)
         self.bot.add_listener(self.on_voice_state_update)
         self.listening_mode_active = False
+        self.on_join_mode_active = False
 
     def load_sounds(self):
         for sound in self.soundspath.iterdir():
@@ -47,12 +48,22 @@ class SoundBoard(commands.Cog):
     @commands.command(name='lm')
     @is_admin()
     async def listener_mode(self, context):
+        self.listening_mode_active = not self.listening_mode_active
+
         if self.listening_mode_active:
-            self.listening_mode_active = False
-            await context.channel.send(f'_Listening mode disabled_')
-        else:
-            self.listening_mode_active = True
             await context.channel.send(f'_Listening mode enabled_')
+        else:
+            await context.channel.send(f'_Listening mode disabled_')
+
+    @commands.command(name='oj')
+    @is_admin()
+    async def on_join_mode(self, context):
+        self.on_join_mode_active = not self.on_join_mode_active
+
+        if self.on_join_mode_active:
+            await context.channel.send(f'_On join enabled_')
+        else:
+            await context.channel.send(f'_On join disabled_')
 
     @commands.command()
     async def stop(self, context):
@@ -77,7 +88,7 @@ class SoundBoard(commands.Cog):
                 await self.bot.voice.play(message.author, sound_path)
 
     async def on_voice_state_update(self, member, before, after):
-        if member == self.bot.user:
+        if member == self.bot.user or not self.on_join_mode_active:
             return
         if before.channel is None and after.channel:
             if after.channel == self.bot.guild.afk_channel:
