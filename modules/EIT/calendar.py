@@ -234,7 +234,7 @@ def fetch_entries(limit=5, max_seconds_until_remind=300):
     calendars_result = service.calendarList().list().execute()
     events = []
 
-    current_time = current_datetime()
+    current_time = datetime.datetime.now(TIMEZONE)
 
     for calendar_info in calendars_result['items']:
         calendar = service.events().list(calendarId=calendar_info['id'], timeMin=now,
@@ -253,7 +253,7 @@ def fetch_entries(limit=5, max_seconds_until_remind=300):
 
 
 def parse_time(event, event_time_key):
-    """Helper function that gets the in :entry_time_key: specified time string
+    """Helper function that gets the in :event_time_key: specified time string
     from the entry dict and returns it as an datetime object"""
 
     if 'dateTime' in event[event_time_key]:
@@ -306,7 +306,3 @@ def parse_remind_time(event):
     else:
         remind_minutes = 30
     return parse_time(event, 'start') - datetime.timedelta(minutes=remind_minutes)
-
-
-def current_datetime():
-    return datetime.datetime.now(TIMEZONE)

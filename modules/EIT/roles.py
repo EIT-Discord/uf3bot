@@ -8,14 +8,14 @@ class Roles(commands.Cog):
 
     @commands.command(name='gamer')
     async def gamer(self, context):
-        """Zur Anzeige der Spielbereitschaft"""
+        """Erhalte/Entferne die Rolle Gamer"""
         await self.toggle_role(context, self.eit.game_role)
 
     async def toggle_role(self, ctx, role_id):
         gamer_role = get_role(self.eit.guild, role_id)
         if gamer_role in ctx.author.roles:
             await ctx.author.remove_roles(gamer_role)
-            await ctx.channel.send('Du gehörst jetzt zu den Gamern!')
+            await ctx.author.send('Du hast die Rolle **Gamer** erhalten!')
         else:
             await ctx.author.add_roles(gamer_role)
-            await ctx.channel.send('Du gehörst jetzt nicht mehr zu den Gamern!')
+            await ctx.author.send('Deine Rolle **Gamer** wurde entfernt!')

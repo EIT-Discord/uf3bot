@@ -3,9 +3,10 @@ import feedparser
 import pickle
 
 from discord.ext import tasks, commands
-
+from core.utils import is_admin
 
 # TODO: Feed der FK04
+
 
 class HMFeed(commands.Cog):
     refresh_interval = 30
@@ -20,9 +21,9 @@ class HMFeed(commands.Cog):
         self.refresh.start()
 
     @commands.command()
+    @is_admin()
     async def feed(self, context, amount: int):
         """Sendet die angebende Anzahl an Feed-Einträgen"""
-        # TODO: wieder entfernen
         if amount > 20:
             amount = 20
         elif amount < 1:
