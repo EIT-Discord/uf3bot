@@ -27,6 +27,10 @@ async def send_more(messageable, content):
             return
 
 
+def codeblock(string):
+    return f'```{string}```'
+
+
 async def ongoing_tasks():
     while True:
         print(len(asyncio.all_tasks()))

@@ -2,6 +2,8 @@ import itertools
 import discord
 from discord.ext.commands import HelpCommand
 
+from core.utils import codeblock
+
 
 class DefaultHelpCommand(HelpCommand):
     """The implementation of the default help command."""
@@ -22,9 +24,10 @@ class DefaultHelpCommand(HelpCommand):
             return
 
         entry = ''
+
         for command in commands:
             name = command.name
-            entry += '{0}{1}```{2}```\n'.format(self.clean_prefix, name, command.short_doc)
+            entry += self.clean_prefix + name + codeblock(command.short_doc)
 
         self.embed.add_field(name=heading, value=entry, inline=False)
 
@@ -60,18 +63,19 @@ class DefaultHelpCommand(HelpCommand):
         await self.send_embed()
 
     async def send_command_help(self, command):
-        self.embed.add_field(name=f"{self.clean_prefix}{command.name}", value=f"```{command.short_doc}```", inline=False)
+        self.embed.add_field(name=f"{self.clean_prefix}{command.name}",
+                             value=codeblock(command.short_doc), inline=False)
         await self.send_embed()
 
     async def send_group_help(self, group):
         filtered = await self.filter_commands(group.commands, sort=self.sort_commands)
-        self.add_indented_commands(filtered, heading=self.commands_heading)
-        self.embed.add_field(name=group.name, value=group.short_doc)
+        self.add_indented_commands(filtered, heading=group.short_doc)
+
         await self.send_embed()
 
     async def send_cog_help(self, cog):
-        if cog.description:
-            self.embed.add_field(name=cog.name, value=cog.description)
+        if cog.signature:
+            self.embed.add_field(name=cog.name, value=cog.signature)
         filtered = await self.filter_commands(cog.get_commands(), sort=self.sort_commands)
         self.add_indented_commands(filtered, heading=self.commands_heading)
         await self.send_embed()

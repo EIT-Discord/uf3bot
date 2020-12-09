@@ -20,7 +20,7 @@ class HMFeed(commands.Cog):
         self.load()
         self.refresh.start()
 
-    @commands.command()
+    @commands.command(usage='!feed <amount>')
     @is_admin()
     async def feed(self, context, amount: int):
         """Sendet die angebende Anzahl an Feed-Einträgen"""
