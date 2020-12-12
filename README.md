@@ -9,18 +9,15 @@ Download the Repo:
 
 Install requirements:  
   ```
-  pip install -r requirements.txt    # Windows
-  pip3 install -r requirements.txt   # Linux
+  pip3 install -r requirements.txt
   ```
   
 Get yourself a discord bot and -token at https://discord.com/developers/applications and set it:
   ```
-  python scripts/set_token.py    # Windows
-  python3 scripts/set_token.py   # Linux
+  python3 scripts/set_token.py
   ```
   
 Start the bot:  
-```
-python run.py    # Windows  
-python3 run.py   # Linux
+``` 
+python3 run.py
 ```
