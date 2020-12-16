@@ -9,3 +9,8 @@ pytz~=2020.4
 google~=3.0.0
 html2text~=2020.1.16
 feedparser~=6.0.2
+
+numpy~=1.19.1
+Pillow~=7.2.0
+requests~=2.24.0
+wolframalpha~=4.1.1
