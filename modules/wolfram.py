@@ -35,10 +35,10 @@ class Wolfram(commands.Cog):
                         binimg = BytesIO(requests.get(imgurl).content)
                         await context.channel.send(imgtitle, file=discord.File(binimg, filename='wolframalpha.png'))
         except AttributeError:
-            await context.channel.send(f'Wolfram Alpha doesn\'t understand your query: "{query}"\n'
+            await context.channel.send(f'```Wolfram Alpha doesn\'t understand your query: "{query}"\n'
                                        f'Try the following:\n'
                                        f'- Use different phrasing or notations\n'
                                        f'- Enter whole words instead of abbreviations\n'
                                        f'- Avoid mixing mathematical and other notations\n'
                                        f'- Check your spelling\n'
-                                       f'- Give your input in English')
+                                       f'- Give your input in English```')
