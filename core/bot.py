@@ -4,7 +4,7 @@ import asyncio
 import sys
 
 import discord
-from discord.ext.commands import bot, ExtensionNotFound
+from discord.ext.commands import bot, ExtensionNotFound, ExtensionAlreadyLoaded
 
 from core.botcontrol import BotControl
 from core.moderation import ModTools
@@ -19,7 +19,7 @@ class UffBot(bot.Bot):
         # datapaths
         self.datapath = datapath
         self.configpath = self.datapath / 'botconfig.pickle'
-
+        self.temppath = self.datapath/'temp/'
         # default config
         self.command_prefix = '!'
         self.presence = ''
@@ -34,12 +34,11 @@ class UffBot(bot.Bot):
         print('Logged in as')
         print(f"{str(self.user)}, {self.user.id}")
         print("-------------------------")
+        print(f'https://discordapp.com/oauth2/authorize?client_id={(await self.application_info()).id}&scope=bot')
 
         if len(self.guilds) == 0:
-            client_id = (await self.application_info()).id
-            print('The bot is not a member of any server, use this url to invite him to your server')
-            print(f'https://discordapp.com/oauth2/authorize?client_id={client_id}&scope=bot')
             sys.exit()
+
         elif len(self.guilds) > 1:
             print('The bot is a member of more than one server, this may lead to unexpected behavior or errors.')
 
@@ -84,8 +83,9 @@ class UffBot(bot.Bot):
             try:
                 self.load_extension('modules.' + module)
             except ExtensionNotFound:
-                print(f'No module named {module} found. Ignoring module import.')
-
+                self.modules.remove(module)
+            except ExtensionAlreadyLoaded:
+                pass
         asyncio.create_task(self.change_presence(status=discord.Status.online, activity=discord.Game(self.presence)))
 
     async def set_presence(self, presence):

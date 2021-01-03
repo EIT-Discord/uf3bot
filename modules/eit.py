@@ -6,7 +6,7 @@ from discord.utils import get
 
 from core.utils import is_admin
 from modules.EIT.calendar import Calendar
-from modules.EIT.hm_feed import HMFeed
+from modules.rss import HMFeed
 from modules.EIT.roles import Roles
 from modules.EIT.setup import setup_dialog
 from modules.EIT.utils import get_member

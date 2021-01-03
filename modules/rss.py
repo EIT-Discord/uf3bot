@@ -5,7 +5,7 @@ import pickle
 from discord.ext import tasks, commands
 from core.utils import is_admin
 
-# TODO: Feed der FK04
+# TODO: make standalone module
 
 
 class HMFeed(commands.Cog):

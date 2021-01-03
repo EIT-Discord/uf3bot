@@ -224,9 +224,12 @@ def fetch_entries(limit=5, max_seconds_until_remind=300):
 
     creds = None
 
-    if os.path.exists('data/token.pickle'):
-        with open('data/token.pickle', 'rb') as token:
+    if os.path.exists('data/google/token.pickle'):
+        with open('data/google/token.pickle', 'rb') as token:
             creds = pickle.load(token)
+    if not creds or not creds.valid:
+        print('Google calendar authorization failed!')
+        return
 
     service = build('calendar', 'v3', credentials=creds)
     # Call the Calendar API
