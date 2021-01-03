@@ -4,11 +4,11 @@ import discord
 import sys
 
 from core.bot import UffBot
+from core.help import DefaultHelpCommand
 
 
 __version__ = '0.2'
 
-from core.help import DefaultHelpCommand
 
 DATAPATH = pathlib.Path(__file__).absolute().parent/'data'
 
@@ -23,7 +23,7 @@ try:
     with (DATAPATH/'dctoken.pickle').open('rb') as file:
         token = pickle.load(file)
 except FileNotFoundError:
-    print('No discord-token found, use scripts/set_token.py to set one. Aborting start')
+    print('No discord-token found, use data/tokenpickler.py to set one. Aborting start')
     sys.exit()
 
 

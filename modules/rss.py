@@ -75,7 +75,7 @@ class HMFeed(commands.Cog):
         asyncio.create_task(self.edit_embed(message, entry))
 
     @staticmethod
-    async def edit_embed(message, entry, timeout=5):
+    async def edit_embed(message, entry):
         counter = 0
 
         while True:
@@ -90,8 +90,6 @@ class HMFeed(commands.Cog):
                 return
 
             except IndexError or AttributeError:
-                await asyncio.sleep(0.5)
                 counter += 1
-
-                if counter >= timeout * 2:
-                    break
+                if counter >= 10000:
+                    return

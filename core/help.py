@@ -26,10 +26,12 @@ class DefaultHelpCommand(HelpCommand):
         entry = ''
 
         for command in commands:
-            name = command.name
-            entry += self.clean_prefix + name + codeblock(command.short_doc)
+            if command.short_doc != '':
+                name = command.name
+                entry += self.clean_prefix + name + codeblock(command.short_doc)
 
-        self.embed.add_field(name=heading, value=entry, inline=False)
+        if entry != '':
+            self.embed.add_field(name=heading, value=entry, inline=False)
 
     async def send_embed(self):
         """A helper utility to send the page output from :attr:`paginator` to the destination."""

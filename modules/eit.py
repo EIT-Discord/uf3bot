@@ -67,7 +67,6 @@ class EIT(commands.Cog):
     @commands.group()
     @is_admin()
     async def eit(self, context):
-        """Zur Konfiguration des EIT-Moduls"""
         pass
 
     @eit.command()
@@ -86,13 +85,12 @@ class EIT(commands.Cog):
 
     @commands.command()
     async def setup(self, context):
-        """Zum Einschreiben in den Server"""
+        """Startet den Setup-Dialog"""
         member = get_member(self.bot, context.author)
         await setup_dialog(self, member)
 
     @commands.command()
     async def admin(self, context):
-        """Easteregg"""
         embed = discord.Embed(name='Admins')
         admin_dict = {"Yannic": "Yannic Breiting (Der Grüne)",
                       "Elias": "Elias Deking (The Brain)",

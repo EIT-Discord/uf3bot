@@ -10,6 +10,7 @@ import html2text as html2text
 from pytz import timezone
 from discord.ext import tasks, commands
 
+from core.utils import codeblock
 
 TIMEZONE = timezone('Europe/Berlin')
 
@@ -52,10 +53,14 @@ class Calendar(commands.Cog):
         for event in events:
             channel = self.eit.admin_calendar
             for semester in self.eit.semester:
+                if semester.name.lower() in event["organizer"]["displayName"].lower():
+                    channel = semester.announcement_channel
+
                 for study_group in semester.study_groups:
                     if study_group.lower() in event["organizer"]["displayName"].lower():
                         channel = semester.announcement_channel
                         break
+
             self.reminders.append(Reminder(self, event, channel))
 
     async def delete_messages(self):
@@ -64,15 +69,15 @@ class Calendar(commands.Cog):
 
     @commands.command()
     async def ongoing(self, context):
-        """Zeigt die aktuellen Termine an"""
+        """Zeigt alle laufenden Termine an"""
         output = ''
         if not self.reminders:
-            await context.channel.send('Es gibt keine laufenden Termine im Moment!')
+            await context.channel.send('Es gibt momentan keine laufenden Termine!')
         else:
             for reminder in self.reminders:
                 if reminder.is_running:
                     output += f'{reminder.calendar_name}: {reminder.summary}\n'
-            await context.channel.send('```' + output + '```')
+            await context.channel.send(codeblock(output))
 
 
 class Reminder:
@@ -270,35 +275,54 @@ def parse_time(event, event_time_key):
 
 
 def format_seconds(seconds):
+    dayflag = False
+
     if seconds > 0:
         output = 'in '
     else:
         seconds *= -1
         output = 'seit '
 
+    # Tage
     days = int(seconds / 86400)
     if days >= 1:
+        dayflag = True
         if days < 2:
-            output += 'einem Tag, '
+            output += 'einem Tag'
         else:
-            output += f'{days} Tagen, '
+            output += f'{days} Tagen'
         seconds -= days*86400
 
+    # Stunden
     hours = int(seconds / 3600)
     if hours >= 1:
-        if hours < 2:
-            output += 'einer Stunde und '
+        if dayflag:
+            output += ' und '
         else:
-            output += f'{hours} Stunden und '
-        seconds -= hours*3600
+            output += ', '
 
+        if hours < 2:
+            output += 'einer Stunde'
+        else:
+            output += f'{hours} Stunden'
+        seconds -= hours*3600
+    else:
+        output += '.'
+        return output
+
+    if dayflag:
+        output += '.'
+        return output
+    else:
+        output += ' und '
+    # Minuten
     minutes = int(seconds / 60)
     if minutes >= 2:
-        output += f'{minutes} Minuten'
+        output += f'{minutes} Minuten.'
     elif minutes >= 1:
-        output += 'einer Minute'
+        output += 'einer Minute.'
     else:
-        output += 'weniger als einer Minute'
+        output += 'weniger als einer Minute.'
 
     return output
 

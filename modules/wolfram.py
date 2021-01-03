@@ -1,5 +1,6 @@
 import pickle
 from io import BytesIO
+from urllib.error import HTTPError
 
 import discord
 import requests
@@ -15,16 +16,21 @@ class Wolfram(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         try:
-            with (self.bot.datapath / 'wolfram_token.pickle').open('rb') as file:
+            with (self.bot.datapath / 'wolframtoken.pickle').open('rb') as file:
                 self.token = pickle.load(file)
         except FileNotFoundError:
-            print('No wolfram-token found, use scripts/set_wolfram.py to set one.')
+            print('No wolfram-token found, use scripts/tokenpickler.py to set one.')
         self.wolfram_client = wolframalpha.Client(self.token)
 
     @commands.command()
     async def wolfram(self, context, *, query: str):
         """Suchanfrage an die WolframAlpha API"""
-        res = self.wolfram_client.query(query)
+        try:
+            res = self.wolfram_client.query(query)
+        except HTTPError:
+            await context.channel.send("Hoppla! Sieht so aus als wäre die Wolfram Alpha API gerade nicht verfügbar.\n"
+                                       "Versuche es in ein paar minuten nochmal.")
+            return
 
         try:
             for pod in res.pods:
