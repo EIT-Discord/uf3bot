@@ -16,7 +16,7 @@ TIMEZONE = timezone('Europe/Berlin')
 
 
 class Calendar(commands.Cog):
-    refresh_interval = 15
+    refresh_interval = 60
 
     def __init__(self, eit):
         self.eit = eit
