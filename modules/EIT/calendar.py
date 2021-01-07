@@ -273,6 +273,7 @@ def parse_time(event, event_time_key):
 
 def format_seconds(seconds):
     dayflag = False
+    hourflag = False
 
     if seconds > 0:
         output = 'in '
@@ -293,6 +294,7 @@ def format_seconds(seconds):
     # Stunden
     hours = int(seconds / 3600)
     if hours >= 1:
+        hourflag = True
         if dayflag:
             output += ' und '
         else:
@@ -303,15 +305,16 @@ def format_seconds(seconds):
         else:
             output += f'{hours} Stunden'
         seconds -= hours*3600
-    else:
+    elif dayflag:
         output += '.'
         return output
 
     if dayflag:
         output += '.'
         return output
-    else:
+    elif hourflag:
         output += ' und '
+
     # Minuten
     minutes = int(seconds / 60)
     if minutes >= 2:
