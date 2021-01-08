@@ -294,9 +294,6 @@ def format_seconds(seconds):
         hourflag = True
         if dayflag:
             output += ' und '
-        else:
-            output += ', '
-
         if hours < 2:
             output += 'einer Stunde'
         else:
@@ -306,10 +303,7 @@ def format_seconds(seconds):
         output += '.'
         return output
 
-    if dayflag:
-        output += '.'
-        return output
-    elif hourflag:
+    if hourflag:
         output += ' und '
 
     # Minuten
