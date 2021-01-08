@@ -82,7 +82,6 @@ class HMFeed(commands.Cog):
     async def edit_embed(self, message, entry):
         try:
             new_embed = message.embeds[0]
-
             new_embed.description = entry['summary']
             published = entry['published_parsed']
             text = f'Veröffentlicht am {published.tm_mday}.{published.tm_mon}.{published.tm_year}'
@@ -90,5 +89,5 @@ class HMFeed(commands.Cog):
             await message.edit(content=None, embed=new_embed)
             return
 
-        except discord.HTTPException:
+        except (discord.HTTPException, IndexError):
             await self.create_edit_task(message, entry)
