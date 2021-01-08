@@ -20,7 +20,7 @@ class Calendar(commands.Cog):
 
     def __init__(self, eit):
         self.eit = eit
-        self.messagespath = self.eit.bot.datapath/'calendarmessages.pickle'
+        self.messagespath = self.eit.bot.datapath / 'calendarmessages.pickle'
         self.reminders = []
 
         self.channels = {'admin': self.eit.admin_calendar}
@@ -109,31 +109,28 @@ class Reminder:
         self.task = asyncio.create_task(self.refresh())
 
     async def refresh(self, refresh_interval=20):
-        while True:
-            try:
-                now = datetime.datetime.now(TIMEZONE)
-                if self.event_end <= now:
-                    self.delete_reminder()
-                elif self.reminder_start <= now:
-                    self.set_embed_title()
-                    if self.message:
-                        await self.update_message()
-                    else:
-                        self.is_running = True
-                        self.message = await self.channel.send(embed=self.embed)
-                elif self.message:
-                    await self.delete_message()
+        try:
+            now = datetime.datetime.now(TIMEZONE)
+            if self.event_end <= now:
+                self.delete_reminder()
+            elif self.reminder_start <= now:
+                self.set_embed_title()
+                if self.message:
+                    await self.update_message()
+                else:
+                    self.is_running = True
+                    self.message = await self.channel.send(embed=self.embed)
+            elif self.message:
+                await self.delete_message()
 
-                await asyncio.sleep(refresh_interval)
+            await asyncio.sleep(refresh_interval)
 
-            except asyncio.CancelledError:
-                pass
+        except asyncio.CancelledError:
+            pass
 
     async def delete_message(self):
         try:
-            await self.message.delete_reminder()
-        except AttributeError:
-            pass
+            await self.message.delete()
         except discord.NotFound:
             pass
 
@@ -289,7 +286,7 @@ def format_seconds(seconds):
             output += 'einem Tag'
         else:
             output += f'{days} Tagen'
-        seconds -= days*86400
+        seconds -= days * 86400
 
     # Stunden
     hours = int(seconds / 3600)
@@ -304,7 +301,7 @@ def format_seconds(seconds):
             output += 'einer Stunde'
         else:
             output += f'{hours} Stunden'
-        seconds -= hours*3600
+        seconds -= hours * 3600
     elif dayflag:
         output += '.'
         return output
