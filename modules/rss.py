@@ -1,4 +1,6 @@
 import asyncio
+
+import discord
 import feedparser
 import pickle
 
@@ -72,24 +74,21 @@ class HMFeed(commands.Cog):
 
     async def send_entry(self, entry):
         message = await self.channel.send(entry['link'])
+        await self.create_edit_task(message, entry)
+
+    async def create_edit_task(self, message, entry):
         asyncio.create_task(self.edit_embed(message, entry))
 
-    @staticmethod
-    async def edit_embed(message, entry):
-        counter = 0
+    async def edit_embed(self, message, entry):
+        try:
+            new_embed = message.embeds[0]
 
-        while True:
-            try:
-                new_embed = message.embeds[0]
+            new_embed.description = entry['summary']
+            published = entry['published_parsed']
+            text = f'Veröffentlicht am {published.tm_mday}.{published.tm_mon}.{published.tm_year}'
+            new_embed.set_footer(text=text)
+            await message.edit(content=None, embed=new_embed)
+            return
 
-                new_embed.description = entry['summary']
-                published = entry['published_parsed']
-                text = f'Veröffentlicht am {published.tm_mday}.{published.tm_mon}.{published.tm_year}'
-                new_embed.set_footer(text=text)
-                await message.edit(content=None, embed=new_embed)
-                return
-
-            except IndexError or AttributeError:
-                counter += 1
-                if counter >= 10000:
-                    return
+        except discord.HTTPException:
+            await self.create_edit_task(message, entry)
