@@ -23,7 +23,7 @@ class VierGewinnt(commands.Cog):
             ie.load_image(self.datapath / f'{i}.png', f'{i}.png')
         for i in range(1, 6):
             ie.set_image(f'{i}.png')
-            await asyncio.sleep(2)
             await ie.update_msg()
+            await asyncio.sleep(2)
 
         await ie.stop()
