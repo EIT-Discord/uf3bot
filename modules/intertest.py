@@ -59,3 +59,10 @@ class InterTest(commands.Cog):
         ie = InterSession(self.bot, self.imageserver, self.datapath, context.channel)
         self.sessions.append(ie)
         await ie.start()
+
+    @commands.command()
+    async def kot(self, context):
+        interbed = InteractiveEmbed(self.bot, self.imageserver, context.channel)
+        interbed.load_image(self.datapath/'test.png')
+        interbed.set_image('test.png')
+        await interbed.start()

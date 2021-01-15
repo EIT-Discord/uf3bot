@@ -172,5 +172,6 @@ class Button:
             except discord.NotFound:
                 pass
 
+
 class MaxSessionCountError(Exception):
     pass
