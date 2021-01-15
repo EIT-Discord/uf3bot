@@ -1,5 +1,3 @@
-import asyncio
-
 from discord.ext import commands
 
 from core.interbed import InteractiveEmbed, ImageServer
@@ -18,8 +16,8 @@ class InterSession:
 
         self.interbed = InteractiveEmbed(bot, imageserver, channel)
 
-        self.interbed.add_button(bot.guild.emojis[0], callback=self.btn_up)
-        self.interbed.add_button(bot.guild.emojis[1], callback=self.btn_down)
+        self.interbed.add_button('⬆', callback=self.btn_up)
+        self.interbed.add_button('⬇', callback=self.btn_down)
 
         for i in range(self.range[0], self.range[1]+1):
             self.interbed.load_image(self.datapath/f'{i}.png')

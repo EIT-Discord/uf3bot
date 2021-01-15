@@ -33,7 +33,7 @@ class ImageServer:
         asyncio.set_event_loop(asyncio.new_event_loop())
         application = web.Application([
             (r"/(.*)", web.StaticFileHandler, {"path": str(self.datapath)})
-        ], debug=True, autoreload=False)
+        ], autoreload=False)
 
         self.tornado_loop = ioloop.IOLoop.current()
         httpserver = application.listen(self.port)
@@ -107,7 +107,6 @@ class InteractiveEmbed:
     def set_image(self, filename: str):
         if os.path.isfile(self.datapath + '/' + filename):
             self.embed.set_image(url=self.base_url + filename)
-            print(self.base_url + filename)
         else:
             raise FileNotFoundError(f'{filename} does not exist in session directory, '
                                     f'probably because it has not been loaded before.')
@@ -123,7 +122,7 @@ class InteractiveEmbed:
     def set_text(self, text: str):
         self.embed.description = text
 
-    def add_button(self, emoji: discord.Emoji, callback: Callable = None, args: tuple = ()):
+    def add_button(self, emoji: Union[discord.Emoji, str], callback: Callable = None, args: tuple = ()):
         button = Button(self, emoji, callback, args)
         self.buttons.append(button)
         return button
