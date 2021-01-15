@@ -159,12 +159,6 @@ class Button:
             if member.id == self.interbed.bot.user.id:
                 return
 
-            # clear all other reactions immediately
-            try:
-                await self.interbed.message.remove_reaction(reaction.emoji, member)
-            except discord.NotFound:
-                pass
-
             # call callback
             if reaction.message == self.interbed.message and reaction.emoji == self.emoji:
                 if asyncio.iscoroutinefunction(self.callback):
@@ -172,6 +166,11 @@ class Button:
                 elif callable(self.callback):
                     self.callback(member, *self.args)
 
+            # clear reaction after callback execution, this prevents spamming a button
+            try:
+                await self.interbed.message.remove_reaction(reaction.emoji, member)
+            except discord.NotFound:
+                pass
 
 class MaxSessionCountError(Exception):
     pass
