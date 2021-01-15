@@ -107,6 +107,7 @@ class InteractiveEmbed:
     def set_image(self, filename: str):
         if os.path.isfile(self.datapath + '/' + filename):
             self.embed.set_image(url=self.base_url + filename)
+            print(self.base_url + filename)
         else:
             raise FileNotFoundError(f'{filename} does not exist in session directory, '
                                     f'probably because it has not been loaded before.')
@@ -141,6 +142,7 @@ class InteractiveEmbed:
 
     def remove_image(self):
         raise NotImplementedError
+
 
 class Button:
     def __init__(self, interbed, emoji, callback, args):

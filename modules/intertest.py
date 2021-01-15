@@ -11,7 +11,7 @@ def setup(bot):
 
 class InterSession:
     def __init__(self, bot, imageserver, datapath, channel):
-        self.counter = 0
+        self.counter = 1
         self.range = (1, 5)
 
         self.datapath = datapath
@@ -24,6 +24,8 @@ class InterSession:
         for i in range(self.range[0], self.range[1]+1):
             self.interbed.load_image(self.datapath/f'{i}.png')
 
+        self.interbed.set_image(f'{self.counter}.png')
+        
     async def start(self):
         await self.interbed.start()
 
