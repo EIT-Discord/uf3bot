@@ -20,9 +20,9 @@ class InterSession:
         self.interbed.add_button('⬇', callback=self.btn_down)
 
         for i in range(self.range[0], self.range[1]+1):
-            self.interbed.load_image(self.datapath/f'{i}.png')
+            self.interbed.load_image(self.datapath/f'{i}.jpg')
 
-        self.interbed.set_image(f'{self.counter}.png')
+        self.interbed.set_image(f'{self.counter}.jpg')
 
     async def start(self):
         await self.interbed.start()
