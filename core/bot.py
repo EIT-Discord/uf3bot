@@ -7,7 +7,6 @@ import discord
 from discord.ext.commands import bot, ExtensionNotFound, ExtensionAlreadyLoaded
 
 from core.botcontrol import BotControl
-from core.embedinteraction import ImageServer
 from core.moderation import ModTools
 
 
@@ -52,9 +51,6 @@ class UffBot(bot.Bot):
         # adding core cogs
         self.add_cog(BotControl(self))
         self.add_cog(ModTools(self))
-
-        # setup ImageServer
-        self.imageserver = ImageServer(self, 'sers-mahlzeit.de')
 
         print('Bot fully initialized, using following settings:')
         print(self.print_config())

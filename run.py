@@ -16,7 +16,7 @@ DATAPATH = pathlib.Path(__file__).absolute().parent/'data'
 # set discord intents
 intents = discord.Intents.default()
 intents.members = True
-
+intents.reactions = True
 
 # try to load the discord token
 try:

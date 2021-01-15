@@ -2,7 +2,7 @@ import asyncio
 
 from discord.ext import commands
 
-from core.embedinteraction import InteractiveEmbed
+from core.interbed import InteractiveEmbed, ImageServer
 
 
 def setup(bot):
@@ -14,16 +14,23 @@ class VierGewinnt(commands.Cog):
         self.bot = bot
         self.datapath = self.bot.datapath / 'viergewinnt'
 
+    async def cb(self, member):
+        await asyncio.sleep(5)
+        print(self.datapath)
+        print(member)
+
     @commands.command()
     async def start(self, context):
-        ie = InteractiveEmbed(self.bot, context.channel)
-        await ie.start()
+        imageserver = ImageServer(self.bot.datapath/'InteractiveEmbed', 'sers-mahlzeit.de')
 
-        for i in range(1, 6):
-            ie.load_image(self.datapath / f'{i}.png', f'{i}.png')
-        for i in range(1, 6):
-            ie.set_image(f'{i}.png')
-            await ie.update_msg()
-            await asyncio.sleep(2)
+        def test(member):
+            print(member)
 
-        await ie.stop()
+        interbed = InteractiveEmbed(self.bot, imageserver, context.channel)
+        interbed.add_button(self.bot.guild.emojis[0], callback=test)
+
+        await interbed.start()
+
+        interbed.load_image(self.datapath/'yannic.png', 'yannic')
+        interbed.set_image('yannic')
+        #await interbed.stop()
