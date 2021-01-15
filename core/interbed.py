@@ -32,7 +32,7 @@ class ImageServer:
         # TODO: works for now, but needs a closer look into the tornado documentation
         asyncio.set_event_loop(asyncio.new_event_loop())
         application = web.Application([
-            (r"/yannic", web.RedirectHandler, {"url": "/yannic.png"}),
+            (r"/yannic", web.RedirectHandler, {"url": "/sebse.jpg"}),
             (r"/(.*)", web.StaticFileHandler, {"path": str(self.datapath)})
         ], debug=True, autoreload=False)
 
