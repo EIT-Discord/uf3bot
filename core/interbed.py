@@ -167,7 +167,7 @@ class Button:
                 pass
 
             # call callback
-            if reaction.emoji == self.emoji:
+            if reaction.message == self.interbed.message and reaction.emoji == self.emoji:
                 if asyncio.iscoroutinefunction(self.callback):
                     await self.callback(member, *self.args)
                 elif callable(self.callback):
