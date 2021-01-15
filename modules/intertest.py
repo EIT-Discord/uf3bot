@@ -33,7 +33,7 @@ class InterSession:
         else:
             self.counter += 1
 
-        self.interbed.set_image(f'{self.counter}.png')
+        self.interbed.set_image(f'{self.counter}.jpg')
         await self.interbed.update_msg()
 
     async def btn_down(self, member):
@@ -42,7 +42,7 @@ class InterSession:
         else:
             self.counter -= 1
 
-        self.interbed.set_image(f'{self.counter}.png')
+        self.interbed.set_image(f'{self.counter}.jpg')
         await self.interbed.update_msg()
 
 
