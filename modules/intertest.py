@@ -25,7 +25,7 @@ class InterSession:
             self.interbed.load_image(self.datapath/f'{i}.png')
 
         self.interbed.set_image(f'{self.counter}.png')
-        
+
     async def start(self):
         await self.interbed.start()
 
@@ -36,6 +36,7 @@ class InterSession:
             self.counter += 1
 
         self.interbed.set_image(f'{self.counter}.png')
+        await self.interbed.update_msg()
 
     async def btn_down(self, member):
         if self.counter <= self.range[0]:
@@ -44,6 +45,7 @@ class InterSession:
             self.counter -= 1
 
         self.interbed.set_image(f'{self.counter}.png')
+        await self.interbed.update_msg()
 
 
 class InterTest(commands.Cog):
