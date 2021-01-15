@@ -44,7 +44,8 @@ class BotControl(commands.Cog):
             await context.channel.send(f'_No module named "{module}" found!_')
         except ExtensionAlreadyLoaded:
             await context.channel.send(f'_Module "{module}" already loaded!_')
-        except:
+        except Exception as e:
+            print(e)
             # If an error gets cought here, it means that the module that was tried to be loaded has some erroneous code
             await context.channel.send(f'_Something went wrong while loading module "{module}", Ignoring import_')
 

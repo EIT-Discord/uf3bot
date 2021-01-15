@@ -32,7 +32,6 @@ class ImageServer:
         # TODO: works for now, but needs a closer look into the tornado documentation
         asyncio.set_event_loop(asyncio.new_event_loop())
         application = web.Application([
-            (r"/yannic", web.RedirectHandler, {"url": "/sebse.jpg"}),
             (r"/(.*)", web.StaticFileHandler, {"path": str(self.datapath)})
         ], debug=True, autoreload=False)
 
@@ -112,7 +111,9 @@ class InteractiveEmbed:
             raise FileNotFoundError(f'{filename} does not exist in session directory, '
                                     f'probably because it has not been loaded before.')
 
-    def load_image(self, filepath: Union[str, os.PathLike], filename: str):
+    def load_image(self, filepath: Union[str, os.PathLike], filename: str = None):
+        if filename is None:
+            filename = os.path.basename(filepath)
         shutil.copyfile(filepath, str(self.datapath + '/' + filename))
 
     def set_title(self, title: str):
@@ -126,6 +127,20 @@ class InteractiveEmbed:
         self.buttons.append(button)
         return button
 
+    def remove_button(self):
+        raise NotImplementedError
+
+    def clear_buttons(self):
+        raise NotImplementedError
+
+    def remove_text(self):
+        raise NotImplementedError
+
+    def remove_title(self):
+        raise NotImplementedError
+
+    def remove_image(self):
+        raise NotImplementedError
 
 class Button:
     def __init__(self, interbed, emoji, callback, args):
