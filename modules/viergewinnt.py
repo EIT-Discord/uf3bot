@@ -31,6 +31,4 @@ class VierGewinnt(commands.Cog):
 
         await interbed.start()
 
-        interbed.load_image(self.datapath/'yannic.png', 'yannic.png')
-        interbed.set_image('yannic.png')
         #await interbed.stop()
