@@ -83,6 +83,11 @@ class InteractiveEmbed:
         self.message = None
         self.buttons = []
 
+        self.is_started = False
+
+        self._buttons_changed = False
+        self._is_stopped = False
+
         if not self.imageserver.is_running:
             self.imageserver.start()
 
@@ -91,20 +96,63 @@ class InteractiveEmbed:
         except MaxSessionCountError:
             raise
 
+    def __del__(self):
+        self.imageserver.delete_session(self.session_id)
+
     async def start(self):
+        """Starts the interactive Embed and sends the initial Embed.
+           If it´s already startet or stopped, this call will be silently ignored."""
+
+        if self._is_stopped or self.is_started:
+            return
+
         self.message = await self.channel.send(embed=self.embed)
+
         for button in self.buttons:
-            await button.add()
+            await button._add()
+
+        self.is_started = True
 
     async def stop(self):
+        """Stops the InteractiveEmbed and deletes the Message and Embed.
+           After this is called, the InteractiveEmbed can´t be started again and should be discarded."""
+
+        if self._is_stopped:
+            return
+
+        # TODO: if message is already deleted?
         await self.message.delete()
         self.imageserver.delete_session(self.session_id)
 
-    async def update_msg(self):
-        await self.message.edit(embed=self.embed)
-        # TODO: wenn die nachricht gelöscht wird?
+        self._is_stopped = True
+        self.is_started = False
 
-    def set_image(self, filename: str):
+    async def update_message(self):
+        """Updates the Message`s Embed.
+           This needs to be called to commit the changes made to the Embed to the actual Message.
+           If the InteractiveEmbed has not been startet yet or has been stopped, this call will be silently ignored."""
+
+        if self.is_started:
+            # TODO: if message has been deleted?
+            # update embed
+            await self.message.edit(embed=self.embed)
+
+            # update buttons
+            if self._buttons_changed:
+                await self.message.clear_reactions()
+                for button in self.buttons:
+                    await button._add()
+                self._buttons_changed = False
+
+    def set_image(self, filename: str = None):
+        """Sets the specified file as new Embed Image.
+           This file has to be loaded through load_image() before. Otherwise this will raise a FileNotFoundError.
+           The filename parameter can be omitted to remove the current image from the Embed."""
+
+        if filename is None:
+            self.embed.set_image(url=discord.Embed.Empty)
+            return
+
         if os.path.isfile(self.datapath + '/' + filename):
             self.embed.set_image(url=self.base_url + filename)
         else:
@@ -116,61 +164,98 @@ class InteractiveEmbed:
             filename = os.path.basename(filepath)
         shutil.copyfile(filepath, str(self.datapath + '/' + filename))
 
+    def remove_image(self):
+        """Removes the current image from the Embed.
+           Alias for set_image() with omitted filename parameter."""
+
+        self.set_image()
+
     def set_title(self, title: str):
+        """Sets the title of the Embed according to the title parameter."""
+
         self.embed.title = title
 
+    def remove_title(self):
+        """Removes the Embed´s title"""
+
+        self.embed.title = ""
+
     def set_text(self, text: str):
+        """Sets the description of the Embed according to the text parameter."""
+
         self.embed.description = text
 
-    def add_button(self, emoji: Union[discord.Emoji, str], callback: Callable = None, args: tuple = ()):
-        button = Button(self, emoji, callback, args)
-        self.buttons.append(button)
-        return button
+    def remove_text(self):
+        """Removes the Embed´s description"""
 
-    def remove_button(self):
-        raise NotImplementedError
+        self.embed.description = ""
+
+    def add_button(self, emoji, callback: Callable = None, args: tuple = (), position: int = None):
+        # TODO: If the emoji is already used as button?
+        new_button = Button(self, emoji, callback, args)
+
+        if position is None:
+            self.buttons.append(new_button)
+        else:
+            self.buttons.insert(position, new_button)
+
+        self._buttons_changed = True
+
+        return new_button
+
+    def remove_button(self, position):
+        try:
+            button = self.buttons.pop(position)
+            button.delete()
+            self._buttons_changed = True
+        except IndexError:
+            raise
 
     def clear_buttons(self):
-        raise NotImplementedError
-
-    def remove_text(self):
-        raise NotImplementedError
-
-    def remove_title(self):
-        raise NotImplementedError
-
-    def remove_image(self):
-        raise NotImplementedError
+        self.buttons = []
+        self._buttons_changed = True
 
 
 class Button:
-    def __init__(self, interbed, emoji, callback, args):
-        self.interbed = interbed
+    def __init__(self, interactive_embed, emoji, callback, args):
         self.emoji = emoji
         self.callback = callback
         self.args = args
 
-    async def add(self):
-        await self.interbed.message.add_reaction(self.emoji)
+        self.interactive_embed = interactive_embed
 
-        @self.interbed.bot.listen('on_reaction_add')
-        async def on_reaction(reaction, member):
-            # ignore own reactions
-            if member.id == self.interbed.bot.user.id:
-                return
+        self.is_active = False
 
-            # call callback
-            if reaction.message == self.interbed.message and reaction.emoji == self.emoji:
+    async def _add(self):
+        await self.interactive_embed.message.add_reaction(self.emoji)
+
+        # TODO: listener should be added by InteractiveEmbed not Button, unwanted reactions have to be cleared
+        @self.interactive_embed.bot.listen('on_reaction_add')
+        async def on_button_press(reaction, member):
+            # only react to this button
+            if reaction.message == self.interactive_embed.message and reaction.emoji == self.emoji:
+                # ignore own reactions
+                if member.id == self.interactive_embed.bot.user.id:
+                    return
+
+                # execute callback
                 if asyncio.iscoroutinefunction(self.callback):
-                    await self.callback(member, *self.args)
+                    await self.callback(self, member, *self.args)
                 elif callable(self.callback):
-                    self.callback(member, *self.args)
+                    self.callback(self, member, *self.args)
 
-            # clear reaction after callback execution, this prevents spamming a button
-            try:
-                await self.interbed.message.remove_reaction(reaction.emoji, member)
-            except discord.NotFound:
-                pass
+                # clear reaction after callback execution,
+                # this prevents calling the callback again, before the previous execution has finished
+                try:
+                    await self.interactive_embed.message.remove_reaction(reaction.emoji, member)
+                except discord.NotFound:
+                    pass
+
+    async def delete(self):
+        try:
+            self.interactive_embed.buttons.remove(self)
+        except ValueError:
+            pass
 
 
 class MaxSessionCountError(Exception):
