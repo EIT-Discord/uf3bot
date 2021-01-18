@@ -20,7 +20,6 @@ class Calendar(commands.Cog):
 
     def __init__(self, eit):
         self.eit = eit
-        self.messagespath = self.eit.bot.datapath / 'calendarmessages.pickle'
         self.reminders = []
 
         self.channels = {'admin': self.eit.admin_calendar}
@@ -109,24 +108,25 @@ class Reminder:
         self.task = asyncio.create_task(self.refresh())
 
     async def refresh(self, refresh_interval=20):
-        try:
-            now = datetime.datetime.now(TIMEZONE)
-            if self.event_end <= now:
-                self.delete_reminder()
-            elif self.reminder_start <= now:
-                self.set_embed_title()
-                if self.message:
-                    await self.update_message()
-                else:
-                    self.is_running = True
-                    self.message = await self.channel.send(embed=self.embed)
-            elif self.message:
-                await self.delete_message()
+        while True:
+            try:
+                now = datetime.datetime.now(TIMEZONE)
+                if self.event_end <= now:
+                    self.delete_reminder()
+                elif self.reminder_start <= now:
+                    self.set_embed_title()
+                    if self.message:
+                        await self.update_message()
+                    else:
+                        self.is_running = True
+                        self.message = await self.channel.send(embed=self.embed)
+                elif self.message:
+                    await self.delete_message()
 
-            await asyncio.sleep(refresh_interval)
+                await asyncio.sleep(refresh_interval)
 
-        except asyncio.CancelledError:
-            pass
+            except asyncio.CancelledError:
+                pass
 
     async def delete_message(self):
         try:
@@ -303,9 +303,11 @@ def format_seconds(seconds):
         output += '.'
         return output
 
-    if hourflag:
-        output += ' und '
+    if hourflag and dayflag:
+        return output
 
+    else:
+        output += ' und '
     # Minuten
     minutes = int(seconds / 60)
     if minutes >= 2:

@@ -4,6 +4,7 @@ from discord.ext.commands import HelpCommand
 
 from core.utils import codeblock
 
+# TODO: Bisschen nicer machen
 
 class DefaultHelpCommand(HelpCommand):
     """The implementation of the default help command."""
