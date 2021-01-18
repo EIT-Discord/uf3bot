@@ -7,6 +7,9 @@ from core.bot import UffBot
 from core.help import DefaultHelpCommand
 
 
+# TODO: Logging modul verwenden -> Logfile
+
+
 __version__ = '0.2'
 
 

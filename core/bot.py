@@ -1,5 +1,4 @@
 import pickle
-
 import asyncio
 import sys
 
@@ -14,6 +13,7 @@ class UffBot(bot.Bot):
     def __init__(self, command_prefix, datapath, **kwargs):
         super().__init__(command_prefix, **kwargs)
 
+        # TODO: Kompabilität für mehr gilden
         self.guild = None
 
         # datapaths
@@ -46,6 +46,7 @@ class UffBot(bot.Bot):
         # load bot settings
         self.load_config()
 
+        # TODO: mehr gilden
         self.guild = self.guilds[0]
 
         # adding core cogs
@@ -80,6 +81,7 @@ class UffBot(bot.Bot):
             print('No bot configuration found. Using default settings.')
 
         # try to load modules from config
+        # TODO: kaputte module handeln
         for module in self.modules:
             try:
                 self.load_extension('modules.' + module)

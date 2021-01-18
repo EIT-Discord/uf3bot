@@ -18,12 +18,13 @@ def is_admin():
 
 
 async def send_more(messageable, content):
+    # TODO: bisschen ausgeklügelteren algorithmus implementieren
     while True:
         if len(content) > 1995:
-            await messageable.send('```' + content[:1994] + '```')
+            await messageable.send(codeblock(content[:1994]))
             content = content[1994:]
         else:
-            await messageable.send('```' + content + '```')
+            await messageable.send(codeblock(content))
             return
 
 
@@ -31,22 +32,9 @@ def codeblock(string):
     return f'```{string}```'
 
 
-async def ongoing_tasks():
-    while True:
-        print(len(asyncio.all_tasks()))
-        await asyncio.sleep(1)
-
-
-async def user_input(bot, channel, user):
-    event = UserInputEvent(bot, channel, user)
-    while True:
-        return await event.queue.get()
-
-
-async def c_user_input(context):
-    event = UserInputEvent(context.bot, context.channel, context.author)
-    while True:
-        return await event.queue.get()
+def tasks():
+    """Debugging helper function to print the number of running asyncio tasks."""
+    print(len(asyncio.all_tasks()))
 
 
 class UserInputEvent:
@@ -57,6 +45,12 @@ class UserInputEvent:
         self.queue = asyncio.Queue()
 
         self.bot.add_listener(self.on_message)
+
+    @classmethod
+    async def create(cls, bot, channel, user):
+        event = cls(bot, channel, user)
+        while True:
+            return await event.queue.get()
 
     async def on_message(self, message):
         if message.author.id == self.user.id and message.channel == self.channel:

@@ -35,21 +35,6 @@ class Stats(commands.Cog):
                 await context.channel.send(str(sorted_result))
 
             return
-            authors_output = 'Most frequent authors:\n'
-            for idx, val in enumerate(authors_result):
-                authors_output += f'{idx + 1}. {val[0]}  ({val[1]})\n'
-                if idx > 20:
-                    break
-
-            await context.channel.send(codeblock(authors_output))
-
-            words_output = 'Most used words:\n'
-            for idx, val in enumerate(words_result):
-                words_output += f'{idx + 1}. {val[0]}  ({val[1]})\n'
-                if idx > 20:
-                    break
-
-            await context.channel.send(codeblock(words_output))
 
 
 async def fetch_messages(guild):

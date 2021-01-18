@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.utils import get
 
 
-from core.utils import is_admin
+from core.utils import is_admin, codeblock
 from modules.EIT.calendar import Calendar
 from modules.rss import HMFeed
 from modules.EIT.roles import Roles
@@ -19,6 +19,8 @@ def setup(bot):
 class EIT(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+        # TODO: Server aus eitconfig.yml laden
         self.guild = bot.guilds[0]
         self.configpath = self.bot.datapath / 'eitconfig.pickle'
 
@@ -70,15 +72,9 @@ class EIT(commands.Cog):
         pass
 
     @eit.command()
-    async def load(self, context):
-        """Wofür auch immer"""
-        self.import_config()
-        await context.channel.send('_Config successfully loaded._')
-
-    @eit.command()
     async def config(self, context):
         """Zeigt die EIT-Config"""
-        await context.channel.send('```' + self.print_config() + '```')
+        await context.channel.send(codeblock(self.print_config()))
 
     async def on_member_join(self, member):
         await setup_dialog(self, member)
@@ -122,3 +118,5 @@ class Semester:
         self.name = name
         self.study_groups = study_groups
         self.announcement_channel = announcement_channel
+
+# TODO: Kurseinschreibung?

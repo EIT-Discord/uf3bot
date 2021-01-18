@@ -1,6 +1,6 @@
 import discord
 
-from core.utils import user_input
+from core.utils import UserInputEvent
 from modules.EIT import embeds
 from modules.EIT.utils import get_study_groups, get_role
 
@@ -14,7 +14,7 @@ async def setup_dialog(eit, member):
     # loop until User tiped in a valid name
     while True:
         # Wait for User input
-        message = await user_input(eit.bot, member.dm_channel, member)
+        message = await UserInputEvent.create(eit.bot, member.dm_channel, member)
         name = message.content
 
         # Check if User tiped in a valid name
@@ -36,7 +36,7 @@ async def setup_dialog(eit, member):
 
     # loop until User tiped in a valid study_group_name
     while flag:
-        message = await user_input(eit.bot, member.dm_channel, member)
+        message = await UserInputEvent.create(eit.bot, member.dm_channel, member)
 
         # Check if User tiped in a valid study_group_name
         for study_group in get_study_groups(eit):
