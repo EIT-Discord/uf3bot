@@ -13,6 +13,7 @@ class UffBot(bot.Bot):
     def __init__(self, command_prefix, datapath, **kwargs):
         super().__init__(command_prefix, **kwargs)
 
+        # TODO: gilden printen
         # TODO: Kompabilität für mehr gilden
         self.guild = None
 

@@ -15,7 +15,7 @@ def get_member(bot, user):
 
 
 def get_study_groups(eit):
-    """ Generator yielding all study_groups belonging to the guild"""
+    """Generator yielding all study_groups belonging to the guild"""
 
     for semester in eit.semester:
         for name, role_id in semester.study_groups.items():

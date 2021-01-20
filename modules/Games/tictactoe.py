@@ -2,8 +2,6 @@ import discord
 import numpy as np
 from discord.ext import commands
 
-from core.utils import codeblock
-
 
 def setup(bot):
     bot.add_cog(TicTacToe(bot))
