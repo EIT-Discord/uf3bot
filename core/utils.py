@@ -32,7 +32,7 @@ def codeblock(string):
     return f'```{string}```'
 
 
-def tasks():
+def ongoing_tasks():
     """Debugging helper function to print the number of running asyncio tasks."""
     print(len(asyncio.all_tasks()))
 
