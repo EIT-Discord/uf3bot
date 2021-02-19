@@ -9,8 +9,3 @@ pytz
 google
 html2text
 feedparser
-
-numpy
-Pillow
-requests
-wolframalpha

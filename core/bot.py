@@ -1,97 +1,139 @@
-import pickle
+import logging
 import asyncio
-import sys
 
 import discord
-from discord.ext.commands import bot, ExtensionNotFound, ExtensionAlreadyLoaded
+from discord.ext import commands, tasks
+from discord.ext.commands import bot
 
-from core.botcontrol import BotControl
-from core.moderation import ModTools
+from core.commands import Commands
+from core.setup import setup_dialog
 
 
-class UffBot(bot.Bot):
-    def __init__(self, command_prefix, datapath, **kwargs):
+class UfffBot(bot.Bot):
+    def __init__(self, command_prefix, config, datapath, **kwargs):
         super().__init__(command_prefix, **kwargs)
 
-        # TODO: gilden printen
-        # TODO: Kompabilität für mehr gilden
-        self.guild = None
-
-        # datapaths
+        self.config = config
         self.datapath = datapath
-        self.configpath = self.datapath/'botconfig.pickle'
-        self.temppath = self.datapath/'temp/'
 
-        # default config
+        self.app_id = None
+
         self.command_prefix = '!'
         self.presence = ''
-        self.modules = []
 
-        # this set determines which attributes of the bot will be saved and loaded
-        self.attributes_to_save = {'presence',
-                                   'modules',
-                                   'command_prefix'}
+        self.guild = None
+        self.roles = {}
+        self.channels = {}
+        self.semesters = []
+        self.study_groups = []
 
     async def on_ready(self):
-        print('Logged in as')
+        self.app_id = (await self.application_info()).id
+
+        print("-------------------------")
+        print('Logged in as:')
         print(f"{str(self.user)}, {self.user.id}")
         print("-------------------------")
-        print(f'https://discordapp.com/oauth2/authorize?client_id={(await self.application_info()).id}&scope=bot')
+        print("Use this URL to invite the bot to your server:")
+        print(f'https://discordapp.com/oauth2/authorize?client_id={self.app_id}&scope=bot')
+        print("-------------------------")
 
-        if len(self.guilds) == 0:
-            sys.exit()
+        self.parse_config()
 
-        elif len(self.guilds) > 1:
-            print('The bot is a member of more than one server, this may lead to unexpected behavior or errors.')
+        await self.change_presence(status=discord.Status.online, activity=discord.Game(self.presence))
 
-        # load bot settings
-        self.load_config()
+        self.add_cog(Commands(self))
+        self.tasks.start()
 
-        # TODO: mehr gilden
-        self.guild = self.guilds[0]
+    async def on_member_join(self, member):
+        await setup_dialog(self, member)
 
-        # adding core cogs
-        self.add_cog(BotControl(self))
-        self.add_cog(ModTools(self))
+    async def userinput(self, channel, member):
+        queue = asyncio.Queue()
 
-        print('Bot fully initialized, using following settings:')
-        print(self.print_config())
+        async def on_message(message):
+            if message.author.id == member.id and message.channel == channel:
+                await queue.put(message)
 
-    def save_config(self):
-        config_to_save = {}
-        for key, val in self.__dict__.items():
-            if key in self.attributes_to_save:
-                config_to_save.update({key: val})
+        self.add_listener(on_message)
+        answer = await queue.get()
+        self.remove_listener(on_message)
+        return answer.content
 
-        with self.configpath.open('wb') as file:
-            pickle.dump(config_to_save, file)
+    @tasks.loop(seconds=10)
+    async def tasks(self):
+        """Debugging helper function that prints the number of running asyncio tasks."""
+        task_count = len(asyncio.all_tasks())
+        logging.debug(f'{task_count} asyncio tasks currently running.')
 
-    def print_config(self):
-        output = ''
-        for key, value in self.__dict__.items():
-            if key in self.attributes_to_save:
-                output += f'{key}: {value}\n'
-        return output[:-1]
+    def parse_config(self):
+        # get guild from config
+        for guild in self.guilds:
+            if self.config['server']['id'] == guild.id:
+                self.guild = guild
+                break
+        else:
+            logging.warning('The bot is not a member of the guild with the specified guild id')
 
-    def load_config(self):
-        try:
-            with self.configpath.open('rb') as file:
-                config = pickle.load(file)
-            self.__dict__.update(config)
-        except FileNotFoundError:
-            print('No bot configuration found. Using default settings.')
+        self.command_prefix = self.config['bot']['prefix']
+        self.presence = self.config['bot']['presence']
 
-        # try to load modules from config
-        # TODO: kaputte module handeln
-        for module in self.modules:
-            try:
-                self.load_extension('modules.' + module)
-            except ExtensionNotFound:
-                self.modules.remove(module)
-            except ExtensionAlreadyLoaded:
-                pass
-        asyncio.create_task(self.change_presence(status=discord.Status.online, activity=discord.Game(self.presence)))
+        # get roles from config
+        for role_name, role_id in self.config['server']['roles'].items():
+            role = discord.utils.get(self.guild.roles, id=role_id)
+            if role:
+                self.roles.update({role_name: role})
+            else:
+                logging.warning(f'role "{role_name}" not found in guild "{self.guild.name}"')
 
-    async def set_presence(self, presence):
-        await self.change_presence(status=discord.Status.online, activity=discord.Game(presence))
-        self.presence = presence
+        # get channels from config
+        for channel_name, channel_id in self.config['server']['channels'].items():
+            channel = discord.utils.get(self.guild.channels, id=channel_id)
+            if channel:
+                self.channels.update({channel_name: channel})
+            else:
+                logging.warning(f'channel "{channel_name}" not found in guild "{self.guild.name}"')
+
+        # get semesters from config
+        for sem_year, semester in self.config['server']['semesters'].items():
+            new_semester = Semester(sem_year)
+
+            sem_channel = discord.utils.get(self.guild.channels, id=semester['channel'])
+            if sem_channel:
+                new_semester.channel = sem_channel
+            else:
+                logging.warning(f'channel of {new_semester} not found in guild "{self.guild}"')
+
+            for gr_name, gr_id in semester['groups'].items():
+                gr_role = discord.utils.get(self.guild.roles, id=gr_id)
+                if gr_role:
+                    new_group = StudyGroup(gr_name, gr_role, new_semester)
+                    new_semester.groups.append(new_group)
+                    self.study_groups.append(new_group)
+                else:
+                    logging.warning(f'role "{gr_name}" not found in guild "{self.guild}"')
+
+            self.semesters.append(new_semester)
+
+
+class Semester:
+    def __init__(self, year, channel=None, groups=None):
+        self.year = year
+        self.channel = channel
+        if groups:
+            self.groups = list(groups)
+        else:
+            self.groups = []
+
+    def __str__(self):
+        return f'{self.year}.Semester'
+
+
+class StudyGroup:
+    def __init__(self, name, role, semester):
+        self.name = name
+        self.semester = semester
+        self.role = role
+
+    def __str__(self):
+        return self.name

@@ -14,9 +14,10 @@ Install requirements:
   
 Get yourself a discord bot and -token at https://discord.com/developers/applications and set it:
   ```
-  python3 scripts/set_token.py
+  python3 tokenpickler.py
   ```
-  
+
+configure 
 Start the bot:  
 ``` 
 python3 run.py

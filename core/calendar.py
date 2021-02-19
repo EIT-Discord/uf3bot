@@ -10,13 +10,11 @@ import html2text as html2text
 from pytz import timezone
 from discord.ext import tasks, commands
 
-from core.utils import codeblock, ongoing_tasks
+from core.utils import codeblock
 
 TIMEZONE = timezone('Europe/Berlin')
 
 
-# TODO: Kalender pickeln, vorhandene Nachrichten abgleichen
-# TODO: Verliert manchmal Nachricht fürs Updaten
 class Calendar(commands.Cog):
     refresh_interval = 60
 
@@ -111,7 +109,6 @@ class Reminder:
 
     async def refresh(self, refresh_interval=20):
         while True:
-            ongoing_tasks()
             try:
                 now = datetime.datetime.now(TIMEZONE)
                 if self.event_end <= now:

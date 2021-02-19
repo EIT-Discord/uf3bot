@@ -1,13 +1,11 @@
 import asyncio
 
+import discord
 import feedparser
 import pickle
 
 from discord.ext import tasks, commands
-from core.utils import is_admin, ongoing_tasks
-
-
-# TODO: make standalone module
+from core.utils import is_admin
 
 
 class HMFeed(commands.Cog):
@@ -89,6 +87,5 @@ class HMFeed(commands.Cog):
             await message.edit(content=None, embed=new_embed)
             return
 
-        except:
-            ongoing_tasks()
+        except (discord.HTTPException, IndexError):
             await self.create_edit_task(message, entry)

@@ -1,19 +1,54 @@
+import os
 import pathlib
 import pickle
-import discord
 import sys
+import logging
+import argparse
 
-from core.bot import UffBot
+import discord
+import yaml
+
+from core.bot import UfffBot
+from core.configvalidator import validate
 from core.help import DefaultHelpCommand
-
-
-# TODO: Logging modul verwenden -> Logfile
 
 
 __version__ = '0.2'
 
 
-DATAPATH = pathlib.Path(__file__).absolute().parent/'data'
+# set up argument parsing
+parser = argparse.ArgumentParser()
+parser.add_argument('--debug', help='start the bot and set logging level to debug', action='store_true')
+parser.add_argument('--config', help='specify a different config file and start the bot')
+args = parser.parse_args()
+
+
+# set up logging
+if args.debug:
+    loglvl = logging.DEBUG
+else:
+    loglvl = logging.WARNING
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=loglvl)
+
+
+# load configuration
+if args.config:
+    configpath = args.config
+else:
+    configpath = 'config.yml'
+
+try:
+    with open(configpath, 'r') as file:
+        config = validate(yaml.load(file, Loader=yaml.Loader))
+except FileNotFoundError:
+    logging.warning('No configuration file found')
+
+
+# make sure data directory exists
+datapath = pathlib.Path(__file__).absolute().parent/'data'
+if not os.path.isdir(datapath):
+    os.mkdir(datapath)
 
 
 # set discord intents
@@ -21,21 +56,26 @@ intents = discord.Intents.default()
 intents.members = True
 intents.reactions = True
 
-# try to load the discord token
+
+# load discord token
 try:
-    with (DATAPATH/'dctoken.pickle').open('rb') as file:
+    with open('token.pickle', 'rb') as file:
         token = pickle.load(file)
 except FileNotFoundError:
-    print('No discord-token found, use data/tokenpickler.py to set one. Aborting start')
-    sys.exit()
+    logging.error('No discord token found, use tokenpickler.py to set one')
+    sys.exit(1)
 
 
 print("-------------------------")
 print(f"Discord.py version: {discord.__version__}")
-print(f"Uffbot version: {__version__}")
+print(f"Ufffbot version: {__version__}")
 print("-------------------------")
 
 
 # start bot
-bot = UffBot('', DATAPATH, intents=intents, help_command=DefaultHelpCommand())
-bot.run(token)
+bot = UfffBot('', config, datapath, intents=intents, help_command=DefaultHelpCommand())
+try:
+    bot.run(token)
+except discord.LoginFailure:
+    logging.error('discord token seems to be invalid')
+    sys.exit(1)

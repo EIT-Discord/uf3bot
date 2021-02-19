@@ -1,24 +1,23 @@
 import asyncio
 
+import discord
 from discord.ext import commands
 
 
-def check_pinned(message):
-    return not message.pinned
-
-
 def is_admin():
+    """Checks if the member who invoked the decorated command has the admin permission on this server"""
     async def predicate(context):
         try:
             return context.author.guild_permissions.administrator
         except AttributeError:
             return False
-
     return commands.check(predicate)
 
 
 async def send_more(messageable, content):
-    # TODO: bisschen ausgeklügelteren algorithmus implementieren
+    """Takes a string and sends it as multiple messages if
+    needed to bypass the discord limit of 2000 chars per message."""
+    # TODO: ausgeklügelteren algorithmus implementieren
     while True:
         if len(content) > 1995:
             await messageable.send(codeblock(content[:1994]))
@@ -29,32 +28,28 @@ async def send_more(messageable, content):
 
 
 def codeblock(string):
+    """Wraps a string into a codeblock"""
     return f'```{string}```'
 
 
-def ongoing_tasks():
-    """Debugging helper function to print the number of running asyncio tasks."""
-    print(len(asyncio.all_tasks()))
 
 
-class UserInputEvent:
-    def __init__(self, bot, channel, user):
-        self.bot = bot
-        self.channel = channel
-        self.user = user
-        self.queue = asyncio.Queue()
 
-        self.bot.add_listener(self.on_message)
+def is_student(eit, member):
+    try:
+        if eit.student_role_id in [role.id for role in member.roles]:
+            return True
+    except AttributeError:
+        pass
+    return False
 
-    @classmethod
-    async def create(cls, bot, channel, user):
-        event = cls(bot, channel, user)
-        while True:
-            return await event.queue.get()
 
-    async def on_message(self, message):
-        if message.author.id == self.user.id and message.channel == self.channel:
-            await self.queue.put(message)
+def get_member(bot, user):
+    return discord.utils.get(bot.guild.members, id=user.id)
 
-    def __del__(self):
-        self.bot.remove_listener(self.on_message)
+
+def get_role(guild, role_id):
+    return discord.utils.get(guild.roles, id=role_id)
+
+
+
