@@ -1,11 +1,19 @@
-import asyncio
-
 import discord
 from discord.ext import commands
 
 
 def is_admin():
-    """Checks if the member who invoked the decorated command has the admin permission on this server"""
+    """Checks if the member who invoked the command has administrator permissions on this server"""
+    async def predicate(context):
+        try:
+            return context.author.guild_permissions.administrator
+        except AttributeError:
+            return False
+    return commands.check(predicate)
+
+
+def is_student():
+    """Checks if the member who invoked the command has administrator permissions on this server"""
     async def predicate(context):
         try:
             return context.author.guild_permissions.administrator
@@ -32,24 +40,5 @@ def codeblock(string):
     return f'```{string}```'
 
 
-
-
-
-def is_student(eit, member):
-    try:
-        if eit.student_role_id in [role.id for role in member.roles]:
-            return True
-    except AttributeError:
-        pass
-    return False
-
-
 def get_member(bot, user):
     return discord.utils.get(bot.guild.members, id=user.id)
-
-
-def get_role(guild, role_id):
-    return discord.utils.get(guild.roles, id=role_id)
-
-
-

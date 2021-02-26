@@ -12,6 +12,7 @@ from discord.ext import tasks, commands
 
 from core.utils import codeblock
 
+
 TIMEZONE = timezone('Europe/Berlin')
 
 
@@ -231,13 +232,13 @@ def fetch_entries(limit=5, max_seconds_until_remind=300):
             creds = pickle.load(token)
 
     service = build('calendar', 'v3', credentials=creds)
+
     # Call the Calendar API
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
     calendars_result = service.calendarList().list().execute()
-    events = []
 
     current_time = datetime.datetime.now(TIMEZONE)
-
+    events = []
     for calendar_info in calendars_result['items']:
         calendar = service.events().list(calendarId=calendar_info['id'], timeMin=now,
                                          maxResults=limit,
@@ -259,11 +260,9 @@ def parse_time(event, event_time_key):
     from the entry dict and returns it as an datetime object"""
 
     if 'dateTime' in event[event_time_key]:
-        time_unparsed = event[event_time_key]['dateTime']
-        return dateutil.parser.parse(time_unparsed).astimezone(TIMEZONE)
+        return dateutil.parser.parse(event[event_time_key]['dateTime']).astimezone(TIMEZONE)
     elif 'date' in event[event_time_key]:
-        time_unparsed = event[event_time_key]['date']
-        return dateutil.parser.parse(time_unparsed).astimezone(TIMEZONE)
+        return dateutil.parser.parse(event[event_time_key]['date']).astimezone(TIMEZONE)
     else:
         print("No date or dateTime key in entry dict recieved from Google Calendar API. Ignoring entry.")
 

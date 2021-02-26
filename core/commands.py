@@ -6,6 +6,7 @@ from core.utils import is_admin, get_member
 
 
 async def toggle_role(member, role):
+    """Gives/removes the specified role to/from the specified member"""
     if role in member.roles:
         await member.remove_roles(role)
         await member.send(f'Du hast die Rolle **{role.name}** erhalten!')
@@ -24,11 +25,6 @@ class Commands(commands.Cog):
         """Set the bots discord presence"""
         await self.bot.set_presence(presence)
         await context.channel.send(f"_Presence set to {presence}._")
-
-    @commands.command()
-    async def echo(self, context):
-        a = await self.bot.userinput(context.channel, context.author)
-        await context.channel.send(a)
 
     @is_admin()
     @commands.command()

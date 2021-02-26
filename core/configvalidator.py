@@ -16,7 +16,8 @@ schema = Schema({
             'student': int,
             'mod':  int,
             'admin': int,
-            'gamer': int
+            'gamer': int,
+            'gast': int
         },
 
         'channels': {
@@ -41,6 +42,7 @@ schema = Schema({
 
 
 def validate(config):
+    """Makes sure the passed configuration file is valid"""
     try:
         return schema.validate(config)
     except SchemaError as e:

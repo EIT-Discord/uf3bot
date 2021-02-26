@@ -2,10 +2,11 @@ import logging
 import asyncio
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import tasks
 from discord.ext.commands import bot
 
 from core.commands import Commands
+from core.models import StudyGroup, Semester
 from core.setup import setup_dialog
 
 
@@ -40,12 +41,12 @@ class UfffBot(bot.Bot):
 
         self.parse_config()
 
-        await self.change_presence(status=discord.Status.online, activity=discord.Game(self.presence))
-
         self.add_cog(Commands(self))
         self.tasks.start()
+        await self.change_presence(status=discord.Status.online, activity=discord.Game(self.presence))
 
     async def on_member_join(self, member):
+        """When a new member joins the server, call the setup-dialog on him."""
         await setup_dialog(self, member)
 
     async def userinput(self, channel, member):
@@ -60,9 +61,9 @@ class UfffBot(bot.Bot):
         self.remove_listener(on_message)
         return answer.content
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=30)
     async def tasks(self):
-        """Debugging helper function that prints the number of running asyncio tasks."""
+        """Periodically logs the number of running asyncio tasks."""
         task_count = len(asyncio.all_tasks())
         logging.debug(f'{task_count} asyncio tasks currently running.')
 
@@ -114,26 +115,3 @@ class UfffBot(bot.Bot):
                     logging.warning(f'role "{gr_name}" not found in guild "{self.guild}"')
 
             self.semesters.append(new_semester)
-
-
-class Semester:
-    def __init__(self, year, channel=None, groups=None):
-        self.year = year
-        self.channel = channel
-        if groups:
-            self.groups = list(groups)
-        else:
-            self.groups = []
-
-    def __str__(self):
-        return f'{self.year}.Semester'
-
-
-class StudyGroup:
-    def __init__(self, name, role, semester):
-        self.name = name
-        self.semester = semester
-        self.role = role
-
-    def __str__(self):
-        return self.name
