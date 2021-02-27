@@ -11,11 +11,12 @@ from core.setup import setup_dialog
 
 
 class UfffBot(bot.Bot):
-    def __init__(self, command_prefix, config, datapath, **kwargs):
+    def __init__(self, command_prefix, config, secrets, datapath, **kwargs):
         super().__init__(command_prefix, **kwargs)
 
         self.config = config
         self.datapath = datapath
+        self.secrets = secrets
 
         self.app_id = None
 

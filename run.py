@@ -1,6 +1,5 @@
 import os
 import pathlib
-import pickle
 import sys
 import logging
 import argparse
@@ -19,7 +18,6 @@ __version__ = '0.3'
 # set up argument parsing
 parser = argparse.ArgumentParser()
 parser.add_argument('--debug', help='start the bot and set logging level to debug', action='store_true')
-parser.add_argument('--config', help='specify a different config file and start the bot')
 args = parser.parse_args()
 
 
@@ -32,14 +30,9 @@ else:
 logging.basicConfig(format='%(levelname)s:%(message)s', level=loglvl)
 
 
-# load configuration
-if args.config:
-    configpath = args.config
-else:
-    configpath = 'config.yml'
-
+# load config file
 try:
-    with open(configpath, 'r') as file:
+    with open('config.yml', 'r') as file:
         config = validate(yaml.load(file, Loader=yaml.Loader))
 except FileNotFoundError:
     logging.warning('No configuration file found')
@@ -51,29 +44,36 @@ if not os.path.isdir(datapath):
     os.mkdir(datapath)
 
 
-# set discord intents
-intents = discord.Intents.default()
-intents.members = True
-intents.reactions = True
-
-
-# load discord token
+# load secrets file
 try:
-    with open('token.pickle', 'rb') as file:
-        token = pickle.load(file)
+    with open('secrets.yml', 'r') as file:
+        secrets = yaml.load(file, Loader=yaml.Loader)
 except FileNotFoundError:
-    logging.error('No discord token found, use tokenpickler.py to set one')
+    logging.error('No secrets file found.')
+    sys.exit(1)
+
+# get discord token
+try:
+    token = secrets['discord']
+    if not token:
+        raise KeyError
+except KeyError:
+    logging.error('No discord token found in secrets file.')
     sys.exit(1)
 
 
 print("-------------------------")
 print(f"Discord.py version: {discord.__version__}")
 print(f"Ufffbot version: {__version__}")
-print("-------------------------")
 
+
+# set discord intents
+intents = discord.Intents.default()
+intents.members = True
+intents.reactions = True
 
 # start bot
-bot = UfffBot('', config, datapath, intents=intents, help_command=DefaultHelpCommand())
+bot = UfffBot('!', config, secrets, datapath, intents=intents, help_command=DefaultHelpCommand())
 try:
     bot.run(token)
 except discord.LoginFailure:
