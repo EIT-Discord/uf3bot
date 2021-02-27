@@ -14,12 +14,8 @@ server:
 
   channels:
     admin_calendar: 783621158418645011
+    hm_feed: 783622385693229078
 
-  hm_feed:
-    url: 'https://www.hm.edu/2/rss_feeds/newsrss/news_allg_rss.de.xml'
-    channel: 783622385693229078
-
-  # semester related roles and channels
   semesters:
     1:
       channel: 783621454083260416

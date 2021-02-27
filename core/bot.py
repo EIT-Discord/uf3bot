@@ -76,6 +76,7 @@ class UfffBot(bot.Bot):
                 break
         else:
             logging.warning('The bot is not a member of the guild with the specified guild id')
+            return
 
         self.command_prefix = self.config['bot']['prefix']
         self.presence = self.config['bot']['presence']

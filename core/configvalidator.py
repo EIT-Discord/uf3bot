@@ -21,12 +21,8 @@ schema = Schema({
         },
 
         'channels': {
-            'admin_calendar': int
-        },
-
-        'hm_feed': {
-            'url': str,
-            'channel': int
+            'admin_calendar': int,
+            'hm_feed': int
         },
 
         'semesters': {
