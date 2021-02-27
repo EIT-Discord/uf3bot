@@ -131,4 +131,4 @@ dmypy.json
 # own shit
 .idea/
 .vscode/
-data/MP3/
+secrets.yml
