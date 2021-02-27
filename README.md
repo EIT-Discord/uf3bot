@@ -1,5 +1,7 @@
 # uf³bot
 
+> **The newest version is located in the "version-0.3" branch**
+
 ## Getting started
 
 Download the Repo:  
