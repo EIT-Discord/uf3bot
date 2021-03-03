@@ -14,7 +14,10 @@ def is_valid(name):
 
 
 async def setup_dialog(bot, member):
-    await member.send(embed=embeds.setup_start)
+    try:
+        await member.send(embed=embeds.setup_start)
+    except (AttributeError, discord.HTTPException):
+        pass
 
     # loop until User tiped in a valid name
     while True:
