@@ -12,16 +12,6 @@ def is_admin():
     return commands.check(predicate)
 
 
-def is_student():
-    """Checks if the member who invoked the command has administrator permissions on this server"""
-    async def predicate(context):
-        try:
-            return context.author.guild_permissions.administrator
-        except AttributeError:
-            return False
-    return commands.check(predicate)
-
-
 async def send_more(messageable, content):
     """Takes a string and sends it as multiple messages if
     needed to bypass the discord limit of 2000 chars per message."""
